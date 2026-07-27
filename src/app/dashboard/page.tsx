@@ -1,12 +1,22 @@
 import { redirect } from "next/navigation";
 
 import { auth, signOut } from "@/auth";
+import { listProjects } from "@/lib/projects";
+import { formatStamp } from "@/lib/format";
+import { NewProjectForm } from "@/components/NewProjectForm";
+import { ProjectRow } from "@/components/ProjectRow";
 
 export default async function DashboardPage() {
   // Authoritative check: always re-derive the session user server-side rather
   // than trusting the client or the optimistic proxy check (rules.md §2).
   const session = await auth();
   if (!session?.user) redirect("/login");
+
+  // Scoped to the session user by the shared data-access helper — the list can
+  // only ever contain this account's own projects.
+  const projects = await listProjects(session.user.id);
+  const active = projects.filter((p) => !p.archivedAt);
+  const archived = projects.filter((p) => p.archivedAt);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -34,27 +44,58 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl px-6 py-16">
+      <main className="mx-auto w-full max-w-3xl px-6 py-12">
         <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          Dashboard
+          Projects
         </p>
-        <h1 className="mt-2 font-serif text-3xl text-parchment">
-          Your log is open.
+        <h1 className="mb-8 mt-2 font-serif text-3xl text-parchment">
+          Your initiatives
         </h1>
-        <p className="mt-3 font-serif text-muted">
-          Signed in as{" "}
-          <span className="font-mono text-sm text-parchment">
-            {session.user.email}
-          </span>
-          .
-        </p>
 
-        <div className="mt-10 rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
-          <p className="font-serif text-muted">
-            No projects yet. Project and decision logging arrive in the next
-            phase.
-          </p>
-        </div>
+        <NewProjectForm />
+
+        <section className="mt-10">
+          {active.length === 0 ? (
+            <div className="rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
+              <p className="font-serif text-muted">
+                No projects yet. Create one to start logging decisions.
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-md border border-white/10">
+              {active.map((project) => (
+                <ProjectRow
+                  key={project.id}
+                  id={project.id}
+                  name={project.name}
+                  description={project.description}
+                  dateStamp={formatStamp(project.createdAt)}
+                  archived={false}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {archived.length > 0 && (
+          <section className="mt-10">
+            <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted">
+              Archived
+            </p>
+            <div className="overflow-hidden rounded-md border border-white/10">
+              {archived.map((project) => (
+                <ProjectRow
+                  key={project.id}
+                  id={project.id}
+                  name={project.name}
+                  description={project.description}
+                  dateStamp={formatStamp(project.createdAt)}
+                  archived={true}
+                />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </div>
   );

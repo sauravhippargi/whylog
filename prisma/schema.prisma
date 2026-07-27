@@ -1,8 +1,9 @@
 // WhyLog Prisma schema.
 // Docs: https://pris.ly/d/prisma-schema
 //
-// Phase 0 defines only the User model needed for auth. Project and Decision
-// models (see architecture.md §3) are added in later phases.
+// Phase 1 adds the Project model (architecture.md §3). The Decision model is
+// deferred to Phase 2 — so the Project.decisions relation from §3 is omitted
+// here and added alongside Decision later.
 
 generator client {
   provider = "prisma-client"
@@ -14,8 +15,23 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
   password  String
-  createdAt DateTime @default(now())
+  projects  Project[]
+  createdAt DateTime  @default(now())
+}
+
+model Project {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  // Soft-removal: null = active, timestamp = archived. There is no hard
+  // delete — archiving is the only removal path (Phase 1 requirement).
+  archivedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
 }

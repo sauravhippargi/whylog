@@ -12,7 +12,14 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+  // The pg driver has no default connection timeout (rules.md §6): without
+  // one, a bad connection hangs indefinitely. Cap it, and keep the per-instance
+  // pool small since we run on serverless behind the Supabase pooler.
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+    connectionTimeoutMillis: 10_000,
+    max: 5,
+  });
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
