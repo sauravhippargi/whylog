@@ -2,12 +2,13 @@ import Link from "next/link";
 import { redirect, notFound } from "next/navigation";
 
 import { auth } from "@/auth";
-import { getOwnedDecision } from "@/lib/decisions";
+import { getOwnedDecision, listDecisions } from "@/lib/decisions";
 import { relatedDecisions } from "@/lib/search";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
 import { AppHeader } from "@/components/AppHeader";
 import { DeleteDecisionButton } from "@/components/DeleteDecisionButton";
+import { SupersedeControl } from "@/components/SupersedeControl";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -46,6 +47,17 @@ export default async function DecisionPage({ params }: PageProps) {
   const entryId = decision.id.slice(-8).toUpperCase();
   const related = await relatedDecisions(session.user.id, id);
 
+  // Other decisions in this project, for the supersede picker (excludes self).
+  const supersedeOptions = (
+    await listDecisions(session.user.id, decision.project.id)
+  )
+    .filter((d) => d.id !== decision.id)
+    .map((d) => ({
+      id: d.id,
+      title: d.title,
+      dateStamp: formatStamp(d.decisionDate),
+    }));
+
   return (
     <div className="flex flex-1 flex-col">
       <AppHeader
@@ -75,6 +87,45 @@ export default async function DecisionPage({ params }: PageProps) {
         <h1 className="mt-3 font-serif text-3xl leading-tight text-parchment">
           {decision.title}
         </h1>
+
+        {/* Supersession — bidirectional brass-seal / verdigris badges + control. */}
+        <div className="mt-4 flex flex-col items-start gap-3">
+          {decision.supersededBy && (
+            <div className="inline-flex items-center gap-2 rounded-sm border border-brass/50 bg-brass/10 px-3 py-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-brass">
+                ◈ Superseded by
+              </span>
+              <Link
+                href={`/decisions/${decision.supersededBy.id}`}
+                className="font-serif text-sm text-brass-light hover:underline"
+              >
+                {decision.supersededBy.title}
+              </Link>
+            </div>
+          )}
+          {decision.supersedes && (
+            <div className="inline-flex items-center gap-2 rounded-sm border border-verdigris/50 bg-verdigris/10 px-3 py-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-verdigris">
+                Supersedes
+              </span>
+              <Link
+                href={`/decisions/${decision.supersedes.id}`}
+                className="font-serif text-sm text-parchment hover:text-brass-light hover:underline"
+              >
+                {decision.supersedes.title}
+              </Link>
+            </div>
+          )}
+          <SupersedeControl
+            decisionId={decision.id}
+            current={
+              decision.supersededBy
+                ? { id: decision.supersededBy.id, title: decision.supersededBy.title }
+                : null
+            }
+            options={supersedeOptions}
+          />
+        </div>
 
         <div className="mt-8">
           <LedgerLine label="Decided">

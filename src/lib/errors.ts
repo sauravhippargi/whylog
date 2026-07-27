@@ -7,3 +7,12 @@ export class NotFoundError extends Error {
     this.name = "NotFoundError";
   }
 }
+
+// Thrown when input is well-formed but breaks a business rule (e.g. a decision
+// trying to supersede itself). Callers map this to a 400 with the message.
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}

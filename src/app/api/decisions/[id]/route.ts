@@ -7,7 +7,7 @@ import {
   deleteDecision,
 } from "@/lib/decisions";
 import { decisionUpdateSchema } from "@/lib/validation";
-import { NotFoundError } from "@/lib/errors";
+import { NotFoundError, ValidationError } from "@/lib/errors";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -61,6 +61,9 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   } catch (error) {
     if (error instanceof NotFoundError) {
       return NextResponse.json({ error: "Decision not found." }, { status: 404 });
+    }
+    if (error instanceof ValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
     throw error;
   }

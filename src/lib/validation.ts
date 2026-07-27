@@ -64,9 +64,10 @@ const decisionFields = {
 
 export const decisionCreateSchema = z.object(decisionFields);
 
-// PATCH is a partial update; require at least one field.
+// PATCH is a partial update; require at least one field. supersededById is
+// update-only (not a create field): a string sets the link, null unsets it.
 export const decisionUpdateSchema = z
-  .object(decisionFields)
+  .object({ ...decisionFields, supersededById: z.string().min(1).nullable() })
   .partial()
   .refine((data) => Object.keys(data).length > 0, {
     message: "Provide at least one field to update",
