@@ -32,7 +32,13 @@ Conventions and guardrails for any code written in this repo. These exist to pre
 - Next.js App Router conventions — route handlers in `app/api/**/route.ts`, server components by default, `"use client"` only where interactivity requires it.
 - Match SyncPM's existing formatting/linting setup rather than introducing a new one.
 
-## 6. Working With Claude Code
+## 6. Stack-Specific Notes (confirmed during Phase 0)
+
+- **Route protection lives in `proxy.ts`, not `middleware.ts`.** Next.js 16 renamed the convention to clarify its role at the network boundary; `proxy.ts` runs on the Node.js runtime.
+- **Prisma Client requires a driver adapter.** We use `@prisma/adapter-pg`. The client generates to `src/generated/prisma` — always import from there, never from `@prisma/client`.
+- **Watch the pg driver's connection timeout.** Unlike Prisma's old bundled engine, the `pg` driver has no default connection timeout — set `connectionTimeoutMillis` and `max` explicitly on the adapter to avoid hangs on a bad connection.
+
+## 7. Working With Claude Code
 
 - One feature per prompt — don't bundle unrelated changes (e.g. don't mix a schema change with a UI change) in a single code prompt.
 - Schema changes (new Prisma models, new migrations) should be called out explicitly in the prompt, not buried inside a larger feature request.
