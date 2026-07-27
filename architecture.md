@@ -7,7 +7,7 @@
 - Prisma (ORM)
 - Supabase Postgres + `pgvector` extension
 - Auth.js, Credentials provider
-- Gemini embeddings endpoint (confirm current free-tier model name — e.g. `text-embedding-004` / `gemini-embedding-001` — before writing embedding code; output dimension determines the vector column size)
+- Gemini embeddings: `gemini-embedding-001`, output truncated to 768 dimensions via `output_dimensionality` (confirmed at Phase 3; free tier available)
 - Gemini generation: `gemini-2.5-flash`, temperature 0, for the synthesized search answer
 - Vercel (deploy)
 
@@ -63,7 +63,7 @@ model Decision {
   supersededById         String?    @unique
   supersededBy           Decision?  @relation("Supersession", fields: [supersededById], references: [id])
   supersedes             Decision?  @relation("Supersession")
-  embedding              Unsupported("vector(768)")?  // dimension TBD by chosen embedding model
+  embedding              Unsupported("vector(768)")?  // gemini-embedding-001, truncated to 768 dims via output_dimensionality
   createdAt              DateTime   @default(now())
   updatedAt              DateTime   @updatedAt
 }
@@ -81,6 +81,8 @@ model Decision {
 | `GET, POST /api/projects/[id]/decisions` | list / create decisions in a project |
 | `GET, PATCH, DELETE /api/decisions/[id]` | read / edit / delete a decision |
 | `POST /api/search` | `{ query: string, projectId?: string }` → `{ answer: string, matches: Decision[] }` |
+| `POST /api/projects/[id]/decisions/draft` | FR8 — `{ rawText: string }` → one candidate decision's fields (not yet saved) |
+| `POST /api/projects/[id]/decisions/import` | FR9 — `{ rawDoc: string }` → an array of candidate decisions (not yet saved); a separate commit call creates the accepted ones via the normal create path |
 
 ## 5. Core Flows
 
@@ -95,8 +97,8 @@ Re-run step 4–5 on any edit that touches one of those four fields.
 
 **Search**
 1. Client sends `{ query, projectId? }`.
-2. API route embeds the query text via Gemini.
-3. Raw SQL pgvector query: cosine distance between query embedding and `Decision.embedding`, filtered to `userId` (via project join) and, if `projectId` is present, further filtered to that project. `ORDER BY distance LIMIT k` (start with k = 5).
+2. API route embeds the query text via Gemini, with `taskType: RETRIEVAL_QUERY`. This must differ from the `RETRIEVAL_DOCUMENT` task type used when storing decision embeddings (confirmed during Phase 3) — Gemini's embedding space is asymmetric between the two task types, so mismatching them silently degrades match quality rather than erroring.
+3. Raw SQL pgvector query: cosine distance (`<=>`) between query embedding and `Decision.embedding`, filtered to `userId` (via project join) and, if `projectId` is present, further filtered to that project. `ORDER BY distance LIMIT k` (start with k = 5).
 4. Take the top matches, build a prompt containing their titles/summaries/rationales, and call Gemini (`gemini-2.5-flash`, temp 0) to generate a short answer that cites which decision(s) it's drawing from.
 5. Return `{ answer, matches }` — UI renders both together, per your call above.
 
@@ -105,6 +107,18 @@ Re-run step 4–5 on any edit that touches one of those four fields.
 
 **Supersede**
 - Setting `supersededById` on a decision is a simple field update — no embedding recompute needed, since supersession doesn't change the decision's own text.
+
+**Paste & draft (FR8)**
+1. Client sends raw pasted text.
+2. API route calls Gemini (`gemini-2.5-flash`, temp 0) with a prompt instructing it to extract one candidate decision's fields as structured JSON (title, decisionSummary, rationale, alternativesConsidered, and decidedBy/decisionDate/tags where inferable).
+3. Response returned to the client, unsaved — pre-fills the existing `DecisionForm` component.
+4. User reviews/edits, then submits through the normal create endpoint. Embedding-on-create fires exactly as it does for a manually-typed decision — this flow only changes how the form gets pre-filled, not the save path.
+
+**Bulk import / migration (FR9)**
+1. Client sends a full pasted/uploaded document.
+2. API route calls Gemini with a prompt instructing it to segment the document into multiple candidate decisions, returned as a JSON array — same field shape as FR8, one object per decision found.
+3. Client renders a review queue; user approves, edits, or rejects each candidate.
+4. On commit, only the accepted candidates are created via the normal create endpoint (one call per accepted decision, or a small batch loop) — each triggers embedding-on-create individually, same as any other decision.
 
 ## 6. Data Isolation
 
@@ -123,5 +137,4 @@ Vercel, same as SyncPM. No webhooks or OAuth callbacks in this project, so no ca
 
 ## 9. Open Technical Risks
 
-- Confirm the current Gemini embedding model name and output dimension before writing the Prisma migration (the vector column size is fixed at creation).
 - Free-tier rate limits on embedding calls — fine at demo scale (single user, moderate decision volume), but worth a basic retry-with-backoff if bulk operations (e.g. re-embedding many decisions after a schema change) come up.
