@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type ProjectRowProps = {
   id: string;
@@ -78,9 +79,12 @@ export function ProjectRow({
       <div className="flex items-baseline gap-4 border-b border-white/5 px-4 py-3 opacity-60">
         <span className="shrink-0 font-mono text-xs text-muted">{dateStamp}</span>
         <div className="min-w-0 flex-1">
-          <p className="truncate font-serif text-parchment line-through decoration-muted/50">
+          <Link
+            href={`/projects/${id}`}
+            className="truncate font-serif text-parchment line-through decoration-muted/50 hover:text-brass-light"
+          >
             {name}
-          </p>
+          </Link>
           {description && (
             <p className="truncate font-serif text-sm text-muted">{description}</p>
           )}
@@ -146,7 +150,12 @@ export function ProjectRow({
     <div className="group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 transition-colors hover:border-brass/30">
       <span className="shrink-0 font-mono text-xs text-muted">{dateStamp}</span>
       <div className="min-w-0 flex-1">
-        <p className="truncate font-serif text-parchment">{name}</p>
+        <Link
+          href={`/projects/${id}`}
+          className="block truncate font-serif text-parchment transition-colors hover:text-brass-light"
+        >
+          {name}
+        </Link>
         {description && (
           <p className="truncate font-serif text-sm text-muted">{description}</p>
         )}

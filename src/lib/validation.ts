@@ -43,3 +43,34 @@ export const projectUpdateSchema = z
 
 export type ProjectCreateInput = z.infer<typeof projectCreateSchema>;
 export type ProjectUpdateInput = z.infer<typeof projectUpdateSchema>;
+
+// Server-side validation for decisions (rules.md §2). Required: title,
+// decisionSummary, rationale, decisionDate. Optional: alternativesConsidered,
+// decidedBy, tags, links. `date format` is enforced via z.coerce.date().
+const decisionFields = {
+  title: z.string().trim().min(1, "Title is required").max(200),
+  decisionSummary: z
+    .string()
+    .trim()
+    .min(1, "A summary of what was decided is required")
+    .max(2000),
+  rationale: z.string().trim().min(1, "Rationale is required").max(5000),
+  decisionDate: z.coerce.date({ message: "A valid decision date is required" }),
+  alternativesConsidered: z.string().trim().max(5000).nullish(),
+  decidedBy: z.string().trim().max(200).nullish(),
+  tags: z.array(z.string().trim().min(1).max(50)).max(30).optional(),
+  links: z.array(z.string().trim().url("Links must be valid URLs").max(2000)).max(30).optional(),
+};
+
+export const decisionCreateSchema = z.object(decisionFields);
+
+// PATCH is a partial update; require at least one field.
+export const decisionUpdateSchema = z
+  .object(decisionFields)
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Provide at least one field to update",
+  });
+
+export type DecisionCreateInput = z.infer<typeof decisionCreateSchema>;
+export type DecisionUpdateInput = z.infer<typeof decisionUpdateSchema>;

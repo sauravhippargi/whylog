@@ -1,9 +1,9 @@
 // WhyLog Prisma schema.
 // Docs: https://pris.ly/d/prisma-schema
 //
-// Phase 1 adds the Project model (architecture.md §3). The Decision model is
-// deferred to Phase 2 — so the Project.decisions relation from §3 is omitted
-// here and added alongside Decision later.
+// Phase 2 adds the Decision model (architecture.md §3). The `embedding` vector
+// column is intentionally NOT here — it lands in Phase 3 via a raw-SQL pgvector
+// migration (rules.md §4), not a Prisma-managed schema change.
 
 generator client {
   provider = "prisma-client"
@@ -23,15 +23,39 @@ model User {
 }
 
 model Project {
-  id          String    @id @default(cuid())
+  id          String     @id @default(cuid())
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
   name        String
   description String?
   // Soft-removal: null = active, timestamp = archived. There is no hard
   // delete — archiving is the only removal path (Phase 1 requirement).
   archivedAt  DateTime?
-  createdAt   DateTime  @default(now())
+  decisions   Decision[]
+  createdAt   DateTime   @default(now())
 
   @@index([userId])
+}
+
+model Decision {
+  id                     String    @id @default(cuid())
+  projectId              String
+  project                Project   @relation(fields: [projectId], references: [id])
+  title                  String
+  decisionSummary        String
+  rationale              String
+  alternativesConsidered String?
+  decidedBy              String?
+  decisionDate           DateTime
+  tags                   String[]
+  links                  String[]
+  // Self-relation for supersession. The field exists now; the UI to set it
+  // arrives in Phase 6. `embedding vector(...)` is added in Phase 3 (raw SQL).
+  supersededById         String?   @unique
+  supersededBy           Decision? @relation("Supersession", fields: [supersededById], references: [id])
+  supersedes             Decision? @relation("Supersession")
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  @@index([projectId])
 }

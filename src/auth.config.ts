@@ -16,9 +16,13 @@ export const authConfig = {
     // server-side in each protected page/route (see rules.md §2).
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+      const { pathname } = nextUrl;
+      const isProtected =
+        pathname.startsWith("/dashboard") ||
+        pathname.startsWith("/projects") ||
+        pathname.startsWith("/decisions");
 
-      if (isOnDashboard) {
+      if (isProtected) {
         // Returning false triggers a redirect to the configured signIn page.
         return isLoggedIn;
       }

@@ -6,3 +6,9 @@ export function formatStamp(date: Date): string {
   const d = String(date.getUTCDate()).padStart(2, "0");
   return `${y}.${m}.${d}`;
 }
+
+// YYYY-MM-DD for prefilling a native <input type="date"> (UTC-based to match
+// how decisionDate is stored and stamped).
+export function toDateInputValue(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}

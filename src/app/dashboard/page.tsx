@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { listProjects } from "@/lib/projects";
 import { formatStamp } from "@/lib/format";
+import { AppHeader } from "@/components/AppHeader";
 import { NewProjectForm } from "@/components/NewProjectForm";
 import { ProjectRow } from "@/components/ProjectRow";
 
@@ -20,29 +21,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-        <span className="font-mono text-xs uppercase tracking-[0.3em] text-brass">
-          WhyLog
-        </span>
-        <div className="flex items-center gap-4">
-          <span className="hidden font-mono text-xs text-muted sm:inline">
-            {session.user.email}
-          </span>
-          <form
-            action={async () => {
-              "use server";
-              await signOut({ redirectTo: "/login" });
-            }}
-          >
-            <button
-              type="submit"
-              className="rounded-sm border border-white/10 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-brass hover:text-brass-light"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-      </header>
+      <AppHeader email={session.user.email} />
 
       <main className="mx-auto w-full max-w-3xl px-6 py-12">
         <p className="font-mono text-xs uppercase tracking-widest text-muted">
