@@ -84,7 +84,7 @@ export default async function ProjectPage({ params }: PageProps) {
                 <Link
                   key={decision.id}
                   href={`/decisions/${decision.id}`}
-                  className="group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 transition-colors last:border-b-0 hover:border-brass/30"
+                  className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 last:border-b-0"
                 >
                   <span className="shrink-0 font-mono text-xs text-muted">
                     {formatStamp(decision.decisionDate)}

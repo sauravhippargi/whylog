@@ -11,24 +11,24 @@ type AppHeaderProps = {
 // Shared top bar: brand (→ dashboard), optional back link, email, sign out.
 export function AppHeader({ email, back }: AppHeaderProps) {
   return (
-    <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-      <div className="flex items-center gap-4">
+    <header className="flex items-center justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-6">
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <Link
           href="/dashboard"
-          className="font-mono text-xs uppercase tracking-[0.3em] text-brass"
+          className="shrink-0 font-mono text-xs uppercase tracking-[0.3em] text-brass"
         >
           WhyLog
         </Link>
         {back && (
           <Link
             href={back.href}
-            className="max-w-[40vw] truncate font-mono text-xs text-muted transition-colors hover:text-brass-light"
+            className="truncate font-mono text-xs text-muted transition-colors hover:text-brass-light"
           >
             ← {back.label}
           </Link>
         )}
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex shrink-0 items-center gap-3 sm:gap-4">
         <Link
           href="/search"
           className="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-brass-light"

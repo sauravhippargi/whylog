@@ -9,8 +9,12 @@ import { formatStamp } from "@/lib/format";
 import { AppHeader } from "@/components/AppHeader";
 import { DeleteDecisionButton } from "@/components/DeleteDecisionButton";
 import { SupersedeControl } from "@/components/SupersedeControl";
+import { EntryStamp } from "@/components/EntryStamp";
 
-type PageProps = { params: Promise<{ id: string }> };
+type PageProps = {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ stamped?: string }>;
+};
 
 // A labeled ledger line: mono label on the left, serif value on the right.
 function LedgerLine({
@@ -30,11 +34,12 @@ function LedgerLine({
   );
 }
 
-export default async function DecisionPage({ params }: PageProps) {
+export default async function DecisionPage({ params, searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   const { id } = await params;
+  const { stamped } = await searchParams;
 
   let decision;
   try {
@@ -67,9 +72,11 @@ export default async function DecisionPage({ params }: PageProps) {
 
       <main className="mx-auto w-full max-w-3xl px-6 py-12">
         <div className="flex items-start justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-widest text-muted">
-            Entry {entryId} · {formatStamp(decision.decisionDate)}
-          </p>
+          <EntryStamp
+            entryId={entryId}
+            dateStamp={formatStamp(decision.decisionDate)}
+            animate={stamped === "1"}
+          />
           <div className="flex shrink-0 items-center gap-4">
             <Link
               href={`/decisions/${decision.id}/edit`}
@@ -202,7 +209,7 @@ export default async function DecisionPage({ params }: PageProps) {
                 <Link
                   key={r.id}
                   href={`/decisions/${r.id}`}
-                  className="group flex items-baseline gap-3 border-b border-white/5 px-3 py-2 transition-colors last:border-b-0 hover:border-brass/30"
+                  className="ledger-row group flex items-baseline gap-3 border-b border-white/5 px-3 py-2 last:border-b-0"
                 >
                   <span className="shrink-0 font-mono text-[11px] text-muted">
                     {formatStamp(r.decisionDate)}

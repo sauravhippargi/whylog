@@ -98,6 +98,16 @@ export function SearchPanel({
         )}
       </form>
 
+      {/* Resting state — before the first search. */}
+      {!result && !pending && !error && (
+        <div className="rounded-md border border-dashed border-white/10 bg-surface p-8 text-center">
+          <p className="font-serif text-muted">
+            Ask a question in plain language. Search runs across all your
+            projects, or narrow it to one.
+          </p>
+        </div>
+      )}
+
       {result && result.matches.length === 0 && (
         <p className="font-serif text-muted">{result.answer}</p>
       )}
@@ -127,7 +137,7 @@ export function SearchPanel({
                 <Link
                   key={m.id}
                   href={`/decisions/${m.id}`}
-                  className="group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 transition-colors last:border-b-0 hover:border-brass/30"
+                  className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 last:border-b-0"
                 >
                   <span className="shrink-0 font-mono text-xs text-muted">
                     {formatStamp(new Date(m.decisionDate))}

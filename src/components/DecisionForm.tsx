@@ -95,7 +95,9 @@ export function DecisionForm(props: DecisionFormProps) {
       }
 
       const data = (await res.json()) as { decision: { id: string } };
-      router.push(`/decisions/${data.decision.id}`);
+      // Newly-logged decisions get the stamp animation on arrival; edits don't.
+      const suffix = props.mode === "create" ? "?stamped=1" : "";
+      router.push(`/decisions/${data.decision.id}${suffix}`);
       router.refresh();
     } catch {
       setError("Couldn't save this entry. Check your connection and try again.");

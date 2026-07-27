@@ -190,15 +190,23 @@ export function ImportPanel({ projectId }: { projectId: string }) {
   return (
     <div className="flex flex-col gap-8">
       {result && (
-        <div className="rounded-md border border-verdigris/40 bg-surface p-4">
-          <p className="font-serif text-parchment">
-            Logged {result.created}{" "}
-            {result.created === 1 ? "decision" : "decisions"}
-            {result.failed > 0 && `, ${result.failed} failed`}.
-          </p>
+        <div className="rounded-md border border-brass/40 bg-surface p-4">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden
+              className="seal-drop inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-brass/70 bg-brass/10 text-xs text-brass"
+            >
+              ◈
+            </span>
+            <p className="font-serif text-parchment">
+              Logged {result.created}{" "}
+              {result.created === 1 ? "decision" : "decisions"}
+              {result.failed > 0 && `, ${result.failed} failed`}.
+            </p>
+          </div>
           <Link
             href={`/projects/${projectId}`}
-            className="mt-2 inline-block font-mono text-xs uppercase tracking-widest text-brass-light hover:underline"
+            className="mt-3 inline-block font-mono text-xs uppercase tracking-widest text-brass-light hover:underline"
           >
             View project ledger →
           </Link>

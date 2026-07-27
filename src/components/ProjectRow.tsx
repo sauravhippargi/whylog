@@ -147,7 +147,7 @@ export function ProjectRow({
   }
 
   return (
-    <div className="group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 transition-colors hover:border-brass/30">
+    <div className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3">
       <span className="shrink-0 font-mono text-xs text-muted">{dateStamp}</span>
       <div className="min-w-0 flex-1">
         <Link
