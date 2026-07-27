@@ -1,9 +1,11 @@
 // WhyLog Prisma schema.
 // Docs: https://pris.ly/d/prisma-schema
 //
-// Phase 2 adds the Decision model (architecture.md §3). The `embedding` vector
-// column is intentionally NOT here — it lands in Phase 3 via a raw-SQL pgvector
-// migration (rules.md §4), not a Prisma-managed schema change.
+// Phase 2 added the Decision model (architecture.md §3). Phase 3 adds the
+// `embedding` vector column. Its DDL (extension + column) is applied by a
+// hand-written raw-SQL migration (rules.md §4), but the column is declared here
+// as Unsupported so Prisma tracks it and won't drop it on future migrations.
+// Reads/writes to it go through $queryRaw/$executeRaw, never the client API.
 
 generator client {
   provider = "prisma-client"
@@ -54,6 +56,9 @@ model Decision {
   supersededById         String?   @unique
   supersededBy           Decision? @relation("Supersession", fields: [supersededById], references: [id])
   supersedes             Decision? @relation("Supersession")
+  // pgvector column (gemini-embedding-001 @ 768 dims). Created via raw SQL;
+  // read/written only through $queryRaw/$executeRaw (rules.md §4).
+  embedding              Unsupported("vector(768)")?
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
 
