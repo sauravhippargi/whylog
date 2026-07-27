@@ -1,68 +1,96 @@
 # WhyLog
 
-A searchable record of the decisions you've made — what was decided, the
-alternatives considered, and the reasoning — retrievable later by asking a
-natural-language question, not just a keyword search.
+**A searchable memory for the decisions your team makes.**
 
-Portfolio project. See [`prd.md`](prd.md), [`architecture.md`](architecture.md),
-[`rules.md`](rules.md), [`phases.md`](phases.md), and [`design.md`](design.md)
-for the full spec. This README covers running and deploying the app.
+Live demo → **https://whylogs.vercel.app**
 
-## Stack
+Six months after a call gets made, the "why" behind it is usually gone — buried in
+a Slack thread, a stale doc, or someone's memory. What was decided, what
+alternatives were weighed, who made the call, and why: all of it evaporates, and
+the same debates get relitigated. WhyLog is a running, searchable log of decisions
+for a project or initiative, built so you can retrieve the reasoning later by
+**asking a question in plain language**, not hunting for keywords.
 
-- Next.js 16 (App Router) + TypeScript (strict)
-- Tailwind CSS v4
-- Prisma 7 (driver-adapter model, `@prisma/adapter-pg`)
-- Supabase Postgres (pgvector added in a later phase)
-- Auth.js v5 (Credentials provider, JWT sessions)
-- Gemini embeddings + generation (added from Phase 3)
-- Deployed on Vercel
+It's a portfolio project demonstrating a working RAG-style pipeline —
+embed → store → retrieve → synthesize — end to end on free-tier infrastructure.
 
-## Status
+## What it does
 
-Phase 0 (scaffolding) is complete: email/password sign up + login, and an
-authenticated dashboard. Projects, decisions, embeddings, and semantic search
-land in later phases (see [`phases.md`](phases.md)).
+- **Semantic search over your decision history.** Ask *"why did we build for the
+  app stores instead of shipping a browser-based version?"* and WhyLog returns the
+  decision that answers it — even with zero keyword overlap — plus a short
+  synthesized verdict that **cites the specific entries** it drew from. When nothing
+  in the log is a strong match, it says so rather than inventing an answer.
+- **Two ways to capture, because a blank form is rarely the starting point.**
+  - *Paste & draft* — drop in a Slack thread or meeting notes and let Gemini draft a
+    single decision's fields for you to review and edit before saving.
+  - *Bulk import* — paste an existing decision doc (e.g. a PR-FAQ) and Gemini
+    extracts every decision into a review queue where you approve, edit, or reject
+    each one before committing.
+  - A manual form is always there as the fallback.
+- **Related decisions.** Every decision's detail page surfaces its nearest
+  neighbors within the same project via vector similarity.
+- **Supersede chains.** Mark a decision as replaced by a later one; both entries
+  show the link bidirectionally ("superseded by" / "supersedes"), so reversals stay
+  visible instead of orphaned.
+- **A ledger, not a dashboard.** The interface is deliberately archival — ink,
+  brass, and stamped entries, dark-mode only — with a single orchestrated moment: a
+  brass seal that stamps each new entry as it's logged.
 
-## Environment variables
+Every decision is embedded on save, so search, related-decisions, and the capture
+flows all work off the same vectors.
 
-Copy [`.env.example`](.env.example) to `.env` and fill in the values. The same
-keys must be set in the Vercel project for production.
+## Tech stack
 
-| Variable | Required in Phase 0 | Purpose |
-|---|---|---|
-| `DATABASE_URL` | yes | Supabase Postgres connection string |
-| `AUTH_SECRET` | yes | Auth.js JWT/session signing secret |
-| `NEXT_PUBLIC_APP_URL` | yes | Absolute app URL (never derived from the request) |
-| `GEMINI_API_KEY` | no (placeholder) | Gemini API key, used from Phase 3 onward |
+- **Next.js** (App Router) + **TypeScript** (strict)
+- **Tailwind CSS**
+- **Prisma** with the `@prisma/adapter-pg` driver adapter
+- **Supabase Postgres** + **pgvector** for embedding storage and cosine-distance search
+- **Auth.js** (Credentials provider, JWT sessions)
+- **Gemini** — `gemini-embedding-001` (768-dim) for embeddings, `gemini-2.5-flash`
+  (temperature 0) for the synthesized answer and the draft/extract flows
+- Deployed on **Vercel**
 
-Generate an `AUTH_SECRET` with:
+## Running it locally
 
-```bash
-npx auth secret
-```
+You'll need a Supabase project (free tier) and a Gemini API key (free tier).
 
-## Local development
-
-1. Create a Supabase project and copy its Postgres connection string into
-   `DATABASE_URL` in `.env`. Use the **direct** connection (port 5432) for
-   migrations; the **pooled** connection (port 6543, `?pgbouncer=true`) is
-   preferred for the app runtime.
-2. Apply the schema to your database:
+1. **Install dependencies**
 
    ```bash
-   npx prisma migrate dev --name init
+   npm install
    ```
 
-3. Run the dev server:
+2. **Configure environment.** Copy the example and fill in the values:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   | Variable | Purpose |
+   |---|---|
+   | `DATABASE_URL` | Supabase pooled connection (port 6543, `?pgbouncer=true`) — app runtime |
+   | `DIRECT_URL` | Supabase direct/session connection (port 5432) — migrations only |
+   | `AUTH_SECRET` | Auth.js session signing secret (`npx auth secret`) |
+   | `NEXT_PUBLIC_APP_URL` | Absolute app URL, e.g. `http://localhost:3000` |
+   | `GEMINI_API_KEY` | Gemini API key (embeddings + generation) |
+
+3. **Apply the schema.** This runs the Prisma migrations, including the raw-SQL
+   migration that enables `pgvector` and adds the `vector(768)` column:
+
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+4. **Run the dev server**
 
    ```bash
    npm run dev
    ```
 
-   Open http://localhost:3000, create an account, and you land on `/dashboard`.
+   Open http://localhost:3000, create an account, and start logging decisions.
 
-### Useful scripts
+### Scripts
 
 ```bash
 npm run dev        # start the dev server
@@ -73,25 +101,14 @@ npm run lint       # eslint
 
 ## Deploying to Vercel
 
-1. **Supabase** — create a project (free tier). From Project Settings →
-   Database, copy the connection string. Use the pooled connection string
-   (port 6543) with `?pgbouncer=true&connection_limit=1` appended for
-   `DATABASE_URL` on Vercel.
-2. **Apply the schema** to the Supabase database once (from your machine, using
-   the direct connection on port 5432):
+Set the four runtime variables in the Vercel project (`DATABASE_URL`,
+`AUTH_SECRET`, `NEXT_PUBLIC_APP_URL`, `GEMINI_API_KEY`) — `DIRECT_URL` is only
+needed locally for migrations. Apply migrations once from your machine with
+`npx prisma migrate deploy`, then import the repo; the build command
+(`prisma generate && next build`) is already set in `package.json`.
 
-   ```bash
-   npx prisma migrate deploy
-   ```
+---
 
-3. **Import the repo** into Vercel (or run `vercel` from the CLI). The build
-   command is already `prisma generate && next build` via `package.json`.
-4. **Set environment variables** in the Vercel project (Production + Preview):
-   `DATABASE_URL`, `AUTH_SECRET`, `NEXT_PUBLIC_APP_URL` (set this to the
-   deployed URL, e.g. `https://whylog.vercel.app`), and `GEMINI_API_KEY`
-   (placeholder for now).
-5. **Deploy.** Once live, `NEXT_PUBLIC_APP_URL` must match the deployed origin;
-   redeploy if you change it.
-
-**Done when:** you can sign up, log in, and see the authenticated dashboard on
-the live Vercel URL.
+Planning docs live alongside the code: [`prd.md`](prd.md),
+[`architecture.md`](architecture.md), [`rules.md`](rules.md),
+[`phases.md`](phases.md), and [`design.md`](design.md).
