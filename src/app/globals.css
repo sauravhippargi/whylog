@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/*
+ * WhyLog design tokens (see design.md). v1 is dark-mode only — an archival,
+ * ship's-log aesthetic: ink background, parchment text, one brass accent.
+ * The full design pass is Phase 7; this is the base palette + type scale.
+ */
+@theme {
+  --color-ink: #0b1220;
+  --color-surface: #141d2e;
+  --color-parchment: #ede6d6;
+  --color-muted: #7c8aa0;
+  --color-brass: #c89b4a;
+  /* Lightened brass for small text where contrast on ink matters. */
+  --color-brass-light: #e0b968;
+  --color-verdigris: #3f7a6e;
+
+  --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
+  --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-parchment);
+  font-family: var(--font-serif);
+}
+
+/* Chrome/data voice: mono. Reading voice: serif. */
+.font-mono {
+  font-family: var(--font-mono);
+}
