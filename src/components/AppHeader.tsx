@@ -29,6 +29,12 @@ export function AppHeader({ email, back }: AppHeaderProps) {
         )}
       </div>
       <div className="flex items-center gap-4">
+        <Link
+          href="/search"
+          className="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-brass-light"
+        >
+          Search
+        </Link>
         {email && (
           <span className="hidden font-mono text-xs text-muted sm:inline">
             {email}

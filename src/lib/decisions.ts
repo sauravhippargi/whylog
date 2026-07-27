@@ -2,7 +2,7 @@ import type { Decision } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { NotFoundError } from "@/lib/errors";
 import { getOwnedProject } from "@/lib/projects";
-import { buildEmbeddingInput, generateEmbedding } from "@/lib/embeddings";
+import { buildEmbeddingInput, embedDocument } from "@/lib/embeddings";
 
 // All Decision database access is centralized here. Ownership is enforced by
 // joining through the decision's project to the session user (architecture.md
@@ -23,7 +23,7 @@ type EmbeddedFields = Pick<
 async function embedDecisionRow(decision: EmbeddedFields): Promise<void> {
   try {
     const input = buildEmbeddingInput(decision);
-    const values = await generateEmbedding(input, "RETRIEVAL_DOCUMENT");
+    const values = await embedDocument(input);
     const literal = `[${values.join(",")}]`;
     await prisma.$executeRaw`UPDATE "Decision" SET embedding = ${literal}::vector WHERE id = ${decision.id}`;
   } catch (error) {

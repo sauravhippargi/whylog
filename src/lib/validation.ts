@@ -92,3 +92,14 @@ export const importRequestSchema = z.object({
     .min(1, "Paste or upload a document to import")
     .max(100000, "That document is too long — split it and try again"),
 });
+
+// Semantic search request (FR5). projectId optional — absent = search across
+// all of the user's projects.
+export const searchRequestSchema = z.object({
+  query: z
+    .string()
+    .trim()
+    .min(1, "Enter a question to search")
+    .max(1000, "That question is too long"),
+  projectId: z.string().min(1).optional(),
+});

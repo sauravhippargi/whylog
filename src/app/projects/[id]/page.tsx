@@ -48,6 +48,12 @@ export default async function ProjectPage({ params }: PageProps) {
             {project.description && (
               <p className="mt-2 font-serif text-muted">{project.description}</p>
             )}
+            <Link
+              href={`/search?projectId=${id}`}
+              className="mt-3 inline-block font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-brass-light"
+            >
+              Search this project →
+            </Link>
           </div>
           <div className="flex shrink-0 items-center gap-3">
             <Link

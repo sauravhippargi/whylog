@@ -37,17 +37,21 @@ function l2Normalize(values: number[]): number[] {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// gemini-embedding-001's embedding space is asymmetric between task types:
+// stored documents and search queries must be embedded with DIFFERENT task
+// types (RETRIEVAL_DOCUMENT vs RETRIEVAL_QUERY), or match quality silently
+// degrades (architecture.md §5). To make that impossible to get wrong, the
+// task type is NOT a public parameter — callers use embedDocument / embedQuery.
+type TaskType = "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY";
+
 /**
  * Embed text with gemini-embedding-001 at 768 dimensions. Returns an
  * L2-normalized vector (Google does not normalize sub-3072 outputs; normalizing
  * keeps cosine/inner-product search well-behaved). Retries transient failures.
- *
- * `taskType` defaults to RETRIEVAL_DOCUMENT for stored decisions; the search
- * path (Phase 4) will pass RETRIEVAL_QUERY.
  */
-export async function generateEmbedding(
+async function requestEmbedding(
   text: string,
-  taskType: "RETRIEVAL_DOCUMENT" | "RETRIEVAL_QUERY" = "RETRIEVAL_DOCUMENT",
+  taskType: TaskType,
 ): Promise<number[]> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -107,4 +111,14 @@ export async function generateEmbedding(
   throw lastError instanceof Error
     ? lastError
     : new Error("Failed to generate embedding.");
+}
+
+/** Embed a stored decision's text (write path). Uses RETRIEVAL_DOCUMENT. */
+export function embedDocument(text: string): Promise<number[]> {
+  return requestEmbedding(text, "RETRIEVAL_DOCUMENT");
+}
+
+/** Embed a user's search query (search path). Uses RETRIEVAL_QUERY. */
+export function embedQuery(text: string): Promise<number[]> {
+  return requestEmbedding(text, "RETRIEVAL_QUERY");
 }

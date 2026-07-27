@@ -20,7 +20,8 @@ export const authConfig = {
       const isProtected =
         pathname.startsWith("/dashboard") ||
         pathname.startsWith("/projects") ||
-        pathname.startsWith("/decisions");
+        pathname.startsWith("/decisions") ||
+        pathname.startsWith("/search");
 
       if (isProtected) {
         // Returning false triggers a redirect to the configured signIn page.
