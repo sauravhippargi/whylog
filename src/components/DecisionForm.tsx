@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-type DecisionFormValues = {
+export type DecisionFormValues = {
   title: string;
   decisionDate: string; // YYYY-MM-DD
   decisionSummary: string;
@@ -16,10 +16,10 @@ type DecisionFormValues = {
 };
 
 type DecisionFormProps =
-  | { mode: "create"; projectId: string; cancelHref: string; initial?: undefined; decisionId?: undefined }
+  | { mode: "create"; projectId: string; cancelHref: string; initial?: DecisionFormValues; decisionId?: undefined }
   | { mode: "edit"; decisionId: string; cancelHref: string; initial: DecisionFormValues; projectId?: undefined };
 
-const EMPTY: DecisionFormValues = {
+export const EMPTY_DECISION_FORM: DecisionFormValues = {
   title: "",
   decisionDate: "",
   decisionSummary: "",
@@ -38,7 +38,7 @@ const inputClass =
 export function DecisionForm(props: DecisionFormProps) {
   const router = useRouter();
   const [values, setValues] = useState<DecisionFormValues>(
-    props.mode === "edit" ? props.initial : EMPTY,
+    props.initial ?? EMPTY_DECISION_FORM,
   );
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);

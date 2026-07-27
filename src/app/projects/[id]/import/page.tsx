@@ -4,11 +4,11 @@ import { auth } from "@/auth";
 import { getOwnedProject } from "@/lib/projects";
 import { NotFoundError } from "@/lib/errors";
 import { AppHeader } from "@/components/AppHeader";
-import { NewDecisionPanel } from "@/components/NewDecisionPanel";
+import { ImportPanel } from "@/components/ImportPanel";
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export default async function NewDecisionPage({ params }: PageProps) {
+export default async function ImportDecisionsPage({ params }: PageProps) {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
@@ -34,10 +34,10 @@ export default async function NewDecisionPage({ params }: PageProps) {
           {project.name}
         </p>
         <h1 className="mb-8 mt-2 font-serif text-3xl text-parchment">
-          Log a decision
+          Import decisions
         </h1>
 
-        <NewDecisionPanel projectId={id} />
+        <ImportPanel projectId={id} />
       </main>
     </div>
   );

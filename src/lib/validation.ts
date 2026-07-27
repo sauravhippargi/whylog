@@ -74,3 +74,21 @@ export const decisionUpdateSchema = z
 
 export type DecisionCreateInput = z.infer<typeof decisionCreateSchema>;
 export type DecisionUpdateInput = z.infer<typeof decisionUpdateSchema>;
+
+// Capture-flow request bodies (FR8/FR9). Caps bound how much text we send to
+// Gemini in one call; generous enough for a Slack thread or a full PR-FAQ.
+export const draftRequestSchema = z.object({
+  rawText: z
+    .string()
+    .trim()
+    .min(1, "Paste some text to draft from")
+    .max(20000, "That text is too long — trim it and try again"),
+});
+
+export const importRequestSchema = z.object({
+  rawDoc: z
+    .string()
+    .trim()
+    .min(1, "Paste or upload a document to import")
+    .max(100000, "That document is too long — split it and try again"),
+});

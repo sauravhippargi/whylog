@@ -49,12 +49,20 @@ export default async function ProjectPage({ params }: PageProps) {
               <p className="mt-2 font-serif text-muted">{project.description}</p>
             )}
           </div>
-          <Link
-            href={`/projects/${id}/decisions/new`}
-            className="shrink-0 rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
-          >
-            Log decision
-          </Link>
+          <div className="flex shrink-0 items-center gap-3">
+            <Link
+              href={`/projects/${id}/import`}
+              className="rounded-sm border border-brass/40 px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-brass-light transition-colors hover:border-brass"
+            >
+              Import
+            </Link>
+            <Link
+              href={`/projects/${id}/decisions/new`}
+              className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
+            >
+              Log decision
+            </Link>
+          </div>
         </div>
 
         <section className="mt-10">
