@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { embedQuery } from "@/lib/embeddings";
 import { generateJson } from "@/lib/generation";
+import { getOwnedDecision } from "@/lib/decisions";
 
 // Semantic search over the caller's own decisions. All Decision access here is
 // scoped to the session user via the project join (rules.md §2) — never by a
@@ -138,4 +139,65 @@ export async function searchDecisions(
   }
 
   return { answer, matches };
+}
+
+// Related decisions (FR6). This is a document-to-document comparison — the
+// current decision's OWN stored embedding vs its same-project siblings — so
+// both sides already use RETRIEVAL_DOCUMENT embeddings from the write path.
+// There is deliberately no query embedding here and no Gemini call at all.
+//
+// Same-task-type (doc-to-doc) distances run MUCH tighter than the query-to-doc
+// distances behind WEAK_MATCH_DISTANCE, so this needs its own, smaller cutoff.
+// Measured during Phase 6 verification: genuinely related same-project decisions
+// (e.g. several about the mobile app) cluster at ~0.10–0.16, while unrelated
+// same-project ones (mobile vs pricing vs hiring) sit at ~0.23+. 0.20 falls in
+// that gap — related neighbors show; a decision with no genuine neighbor gets
+// the empty state instead of a forced weak match (rules.md §1). Corpus-dependent.
+const RELATED_MAX_DISTANCE = 0.2;
+const RELATED_K = 5;
+
+export type RelatedDecision = {
+  id: string;
+  title: string;
+  decisionDate: Date;
+  tags: string[];
+  distance: number;
+};
+
+/**
+ * Nearest same-project neighbors of a decision by embedding distance, excluding
+ * itself. Ownership is enforced via getOwnedDecision (rules.md §2) before the
+ * raw query runs. Returns [] when the decision has no embedding, the project has
+ * no other embedded decisions, or nothing clears the threshold.
+ */
+export async function relatedDecisions(
+  userId: string,
+  decisionId: string,
+): Promise<RelatedDecision[]> {
+  const decision = await getOwnedDecision(userId, decisionId);
+
+  const rows = await prisma.$queryRaw<RelatedDecision[]>`
+    SELECT
+      d.id,
+      d.title,
+      d."decisionDate",
+      d.tags,
+      (d.embedding <=> cur.embedding) AS distance
+    FROM "Decision" d
+    JOIN "Project" p ON d."projectId" = p.id
+    CROSS JOIN (
+      SELECT embedding FROM "Decision" WHERE id = ${decisionId}
+    ) cur
+    WHERE p."userId" = ${userId}
+      AND d."projectId" = ${decision.projectId}
+      AND d.id <> ${decisionId}
+      AND d.embedding IS NOT NULL
+      AND cur.embedding IS NOT NULL
+    ORDER BY distance ASC
+    LIMIT ${RELATED_K}
+  `;
+
+  return rows
+    .map((r) => ({ ...r, distance: Number(r.distance) }))
+    .filter((r) => r.distance <= RELATED_MAX_DISTANCE);
 }

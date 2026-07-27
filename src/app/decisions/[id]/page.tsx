@@ -3,6 +3,7 @@ import { redirect, notFound } from "next/navigation";
 
 import { auth } from "@/auth";
 import { getOwnedDecision } from "@/lib/decisions";
+import { relatedDecisions } from "@/lib/search";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
 import { AppHeader } from "@/components/AppHeader";
@@ -43,6 +44,7 @@ export default async function DecisionPage({ params }: PageProps) {
   }
 
   const entryId = decision.id.slice(-8).toUpperCase();
+  const related = await relatedDecisions(session.user.id, id);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -134,6 +136,41 @@ export default async function DecisionPage({ params }: PageProps) {
           Logged {formatStamp(decision.createdAt)} · Updated{" "}
           {formatStamp(decision.updatedAt)}
         </p>
+
+        <section className="mt-12">
+          <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted">
+            Related decisions
+          </p>
+          {related.length === 0 ? (
+            <p className="font-serif text-sm text-muted">
+              No related entries yet.
+            </p>
+          ) : (
+            <div className="overflow-hidden rounded-md border border-white/10">
+              {related.map((r) => (
+                <Link
+                  key={r.id}
+                  href={`/decisions/${r.id}`}
+                  className="group flex items-baseline gap-3 border-b border-white/5 px-3 py-2 transition-colors last:border-b-0 hover:border-brass/30"
+                >
+                  <span className="shrink-0 font-mono text-[11px] text-muted">
+                    {formatStamp(r.decisionDate)}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-serif text-sm text-parchment transition-colors group-hover:text-brass-light">
+                      {r.title}
+                    </p>
+                    {r.tags.length > 0 && (
+                      <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
+                        {r.tags.join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
     </div>
   );
