@@ -123,6 +123,19 @@ export async function searchDecisions(
 
   // pg returns float8 as a number already, but normalize defensively.
   const matches = strong.map((m) => ({ ...m, distance: Number(m.distance) }));
-  const answer = await synthesizeAnswer(query, matches);
+
+  // Retrieval (embeddings + pgvector) and answer synthesis use separate Gemini
+  // quotas. If synthesis fails (e.g. the free-tier generation quota is spent),
+  // still return the matched decisions rather than failing the whole search —
+  // the matches are the verifiable substance; the written answer sits on top.
+  let answer: string;
+  try {
+    answer = await synthesizeAnswer(query, matches);
+  } catch (error) {
+    console.error("Answer synthesis failed; returning matches only:", error);
+    answer =
+      "Showing the closest matching decisions below. A written summary couldn't be generated just now — try again shortly.";
+  }
+
   return { answer, matches };
 }
