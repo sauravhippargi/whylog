@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import type { DecisionFormValues } from "./DecisionForm";
+import {
+  PasteFromClipboardButton,
+  SECONDARY_PILL,
+} from "./PasteFromClipboardButton";
 
 type DraftCandidate = {
   title: string;
@@ -229,15 +233,24 @@ export function ImportPanel({ projectId }: { projectId: string }) {
           placeholder="Paste document text…"
           className="w-full rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass"
         />
-        <div className="mt-3 flex flex-wrap items-center gap-4">
-          <button
-            onClick={onExtract}
-            disabled={extracting || rawDoc.trim().length === 0}
-            className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <PasteFromClipboardButton
+            onText={(text) => {
+              setRawDoc(text);
+              setError(null);
+            }}
+            onError={setError}
+          />
+          <label
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.currentTarget.querySelector("input")?.click();
+              }
+            }}
+            className={SECONDARY_PILL}
           >
-            {extracting ? "Extracting…" : "Extract decisions"}
-          </button>
-          <label className="cursor-pointer font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-brass-light">
             Upload .txt / .md
             <input
               type="file"
@@ -246,6 +259,13 @@ export function ImportPanel({ projectId }: { projectId: string }) {
               className="hidden"
             />
           </label>
+          <button
+            onClick={onExtract}
+            disabled={extracting || rawDoc.trim().length === 0}
+            className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {extracting ? "Extracting…" : "Extract decisions"}
+          </button>
         </div>
         {error && (
           <p role="alert" className="mt-3 font-mono text-xs text-brass-light">

@@ -7,6 +7,7 @@ import {
   EMPTY_DECISION_FORM,
   type DecisionFormValues,
 } from "./DecisionForm";
+import { PasteFromClipboardButton } from "./PasteFromClipboardButton";
 
 type DraftCandidate = {
   title: string;
@@ -93,7 +94,14 @@ export function NewDecisionPanel({ projectId }: { projectId: string }) {
             {error}
           </p>
         )}
-        <div className="mt-3">
+        <div className="mt-3 flex flex-wrap items-center gap-4">
+          <PasteFromClipboardButton
+            onText={(text) => {
+              setRawText(text);
+              setError(null);
+            }}
+            onError={setError}
+          />
           <button
             onClick={onDraft}
             disabled={drafting || rawText.trim().length === 0}
