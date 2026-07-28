@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,14 @@ export default async function LoginPage() {
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-16">
       <div className="w-full max-w-sm rounded-md border border-white/10 bg-surface p-8">
+        <Image
+          src="/logo-mark.png"
+          alt=""
+          width={40}
+          height={40}
+          className="mb-3 h-10 w-10"
+          priority
+        />
         <p className="font-mono text-xs uppercase tracking-widest text-brass">
           WhyLog
         </p>

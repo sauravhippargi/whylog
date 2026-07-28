@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -10,6 +11,14 @@ export default async function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 px-4 py-16 text-center">
       <div className="max-w-xl">
+        <Image
+          src="/logo.png"
+          alt="WhyLog"
+          width={160}
+          height={160}
+          className="mx-auto mb-2 h-32 w-32 sm:h-40 sm:w-40"
+          priority
+        />
         <p className="font-mono text-xs uppercase tracking-[0.3em] text-brass">
           WhyLog
         </p>

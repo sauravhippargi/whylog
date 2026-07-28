@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { signOut } from "@/auth";
@@ -15,8 +16,16 @@ export function AppHeader({ email, back }: AppHeaderProps) {
       <div className="flex min-w-0 items-center gap-3 sm:gap-4">
         <Link
           href="/dashboard"
-          className="shrink-0 font-mono text-xs uppercase tracking-[0.3em] text-brass"
+          className="flex shrink-0 items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-brass"
         >
+          <Image
+            src="/logo-mark.png"
+            alt=""
+            width={24}
+            height={24}
+            className="h-6 w-6"
+            priority
+          />
           WhyLog
         </Link>
         {back && (
