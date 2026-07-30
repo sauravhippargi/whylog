@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   // Authoritative check: always re-derive the session user server-side rather
   // than trusting the client or the optimistic proxy check (rules.md §2).
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/");
 
   // Scoped to the session user by the shared data-access helper — the list can
   // only ever contain this account's own projects.

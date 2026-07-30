@@ -6,12 +6,13 @@ import { signIn } from "next-auth/react";
 
 type Mode = "login" | "signup";
 
-// The landing page's sign-in / sign-up card. Pure restyle of the existing
-// Credentials flow (same steps as AuthForm): sign-up POSTs to /api/auth/signup,
-// then both modes call signIn("credentials"). No auth logic is reinvented here.
-export function LandingAuth() {
+// The app's single sign-in / sign-up surface. Sign-up POSTs to
+// /api/auth/signup, then both modes call signIn("credentials").
+// `initialMode` lets the legacy /signup URL deep-link straight to the sign-up
+// tab instead of dropping the visitor on sign-in.
+export function LandingAuth({ initialMode = "login" }: { initialMode?: Mode }) {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 

@@ -52,7 +52,7 @@ export function AppHeader({ email, back }: AppHeaderProps) {
         <form
           action={async () => {
             "use server";
-            await signOut({ redirectTo: "/login" });
+            await signOut({ redirectTo: "/" });
           }}
         >
           <button

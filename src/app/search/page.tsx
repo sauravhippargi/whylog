@@ -10,7 +10,7 @@ type PageProps = { searchParams: Promise<{ projectId?: string }> };
 
 export default async function SearchPage({ searchParams }: PageProps) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/");
 
   const { projectId } = await searchParams;
 

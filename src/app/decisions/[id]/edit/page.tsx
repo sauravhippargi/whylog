@@ -11,7 +11,7 @@ type PageProps = { params: Promise<{ id: string }> };
 
 export default async function EditDecisionPage({ params }: PageProps) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/");
 
   const { id } = await params;
 

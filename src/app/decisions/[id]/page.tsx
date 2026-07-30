@@ -37,7 +37,7 @@ function LedgerLine({
 
 export default async function DecisionPage({ params, searchParams }: PageProps) {
   const session = await auth();
-  if (!session?.user) redirect("/login");
+  if (!session?.user) redirect("/");
 
   const { id } = await params;
   const { stamped } = await searchParams;

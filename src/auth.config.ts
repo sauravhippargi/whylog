@@ -5,7 +5,10 @@ import type { NextAuthConfig } from "next-auth";
 // imports Prisma/bcrypt, so it stays lightweight everywhere it's used.
 export const authConfig = {
   pages: {
-    signIn: "/login",
+    // The landing page at "/" is the single sign-in surface — it carries the
+    // real Credentials form. Auth.js sends unauthenticated visitors here when
+    // the `authorized` callback below rejects a protected route.
+    signIn: "/",
   },
   session: {
     strategy: "jwt",
@@ -24,12 +27,14 @@ export const authConfig = {
         pathname.startsWith("/search");
 
       if (isProtected) {
-        // Returning false triggers a redirect to the configured signIn page.
+        // Returning false triggers a redirect to the configured signIn page ("/").
         return isLoggedIn;
       }
 
-      // Send already-authenticated users away from the auth pages.
-      if (isLoggedIn && (nextUrl.pathname === "/login" || nextUrl.pathname === "/signup")) {
+      // Send already-authenticated users straight to the dashboard rather than
+      // through the legacy /login and /signup redirects, saving a hop. "/" is
+      // handled in its own page component (the authoritative check).
+      if (isLoggedIn && (pathname === "/login" || pathname === "/signup")) {
         return Response.redirect(new URL("/dashboard", nextUrl));
       }
 

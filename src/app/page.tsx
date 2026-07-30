@@ -6,12 +6,18 @@ import { LandingAuth } from "@/components/LandingAuth";
 import { LandingChart } from "@/components/LandingChart";
 import { LandingSearchDemo } from "@/components/LandingSearchDemo";
 
-// Combined landing + sign-in page for the root route. Signed-out visitors see
-// the marketing/demo page; already-authenticated users are sent to the
-// dashboard (same rule proxy.ts applies to /login and /signup).
-export default async function HomePage() {
+type PageProps = { searchParams: Promise<{ tab?: string }> };
+
+// Combined landing + sign-in page for the root route, and the app's single
+// sign-in surface — every unauthenticated redirect and sign-out lands here.
+// Signed-out visitors see the marketing/demo page; already-authenticated users
+// are sent to the dashboard. `?tab=signup` opens the card on the sign-up tab
+// (used by the legacy /signup URL).
+export default async function HomePage({ searchParams }: PageProps) {
   const session = await auth();
   if (session?.user) redirect("/dashboard");
+
+  const { tab } = await searchParams;
 
   return (
     <div className="landing">
@@ -47,7 +53,7 @@ export default async function HomePage() {
           </a>
         </div>
 
-        <LandingAuth />
+        <LandingAuth initialMode={tab === "signup" ? "signup" : "login"} />
       </section>
 
       <section className="demo-wrap" id="demo">
