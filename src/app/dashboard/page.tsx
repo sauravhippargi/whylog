@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { listProjects } from "@/lib/projects";
 import { formatStamp } from "@/lib/format";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { NewProjectForm } from "@/components/NewProjectForm";
 import { ProjectRow } from "@/components/ProjectRow";
 
@@ -19,21 +19,27 @@ export default async function DashboardPage() {
   const active = projects.filter((p) => !p.archivedAt);
   const archived = projects.filter((p) => p.archivedAt);
 
+  // Same shell as every other view; no project highlighted in the sidebar.
+  const shellProjects = active.map((p) => ({ id: p.id, name: p.name }));
+
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader email={session.user.email} />
+    <AppShell email={session.user.email} projects={shellProjects}>
+      <div className="c-head">
+        <div>
+          <h1>Your initiatives</h1>
+          <p className="c-sub">
+            {active.length} {active.length === 1 ? "project" : "projects"}
+            {archived.length > 0 && ` · ${archived.length} archived`}
+          </p>
+        </div>
+      </div>
 
-      <main className="mx-auto w-full max-w-3xl px-6 py-12">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          Projects
-        </p>
-        <h1 className="mb-8 mt-2 font-serif text-3xl text-parchment">
-          Your initiatives
-        </h1>
+      <div className="c-body">
+        <div id="new-project" className="scroll-mt-24">
+          <NewProjectForm />
+        </div>
 
-        <NewProjectForm />
-
-        <section className="mt-10">
+        <section className="mt-8">
           {active.length === 0 ? (
             <div className="rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
               <p className="font-serif text-muted">
@@ -75,7 +81,7 @@ export default async function DashboardPage() {
             </div>
           </section>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

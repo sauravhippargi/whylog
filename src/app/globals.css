@@ -678,3 +678,440 @@ html {
     transition: none;
   }
 }
+
+/* ============================================================
+ * App shell — persistent top bar + project sidebar used by every authenticated
+ * page (see whylog-nav-hybrid mockup). Scoped under `.shell` so its element
+ * selectors stay local, and built from the established tokens (design.md):
+ * this is a restructure of chrome, not a re-theme. Deliberately does NOT
+ * redefine the global `.ledger-row` used by the decision lists.
+ * ============================================================ */
+.shell {
+  --surface-2: #0f1626;
+  --line: rgba(200, 155, 74, 0.18);
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+/* ---- Top bar (full width, spans over the sidebar) ---- */
+.shell .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 13px 22px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+}
+.shell .tb-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 212px;
+  flex-shrink: 0;
+}
+.shell .tb-seal {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.shell .tb-brand span {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--color-parchment);
+}
+.shell .tb-menu {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+.shell .tb-menu:hover {
+  color: var(--color-brass);
+  border-color: var(--color-brass);
+}
+
+/* Search — the app's centre of gravity. */
+.shell .tb-search {
+  flex: 1;
+  max-width: 620px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 17px;
+  background: var(--color-ink);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  transition: border-color 0.15s;
+}
+.shell .tb-search:hover,
+.shell .tb-search:focus-within {
+  border-color: var(--color-brass);
+}
+.shell .tb-search .q {
+  color: var(--color-brass);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.shell .tb-search input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-parchment);
+  font-family: var(--font-serif);
+  font-size: 14px;
+  padding: 3px 0;
+}
+.shell .tb-search input::placeholder {
+  color: var(--color-muted);
+}
+/* Scope toggle — only rendered inside a project, so narrowing is deliberate. */
+.shell .tb-scope {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+  padding: 2px;
+  background: var(--surface-2);
+  border-radius: 20px;
+}
+.shell .tb-scope button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 18px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+.shell .tb-scope button.on {
+  background: color-mix(in srgb, var(--color-brass) 16%, transparent);
+  color: var(--color-brass);
+}
+.shell .tb-go {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1;
+  padding: 4px 2px 4px 6px;
+  transition: color 0.15s;
+}
+.shell .tb-go:hover {
+  color: var(--color-brass);
+}
+
+.shell .tb-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.shell .tb-account {
+  position: relative;
+}
+.shell .tb-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-verdigris);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-ink);
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+}
+.shell .tb-menu-pop {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 200px;
+  background: var(--color-surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+.shell .tb-menu-pop .email {
+  display: block;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-muted);
+  word-break: break-all;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
+}
+.shell .tb-menu-pop button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+.shell .tb-menu-pop button:hover {
+  background: color-mix(in srgb, var(--color-brass) 8%, transparent);
+  color: var(--color-brass);
+}
+
+/* ---- Body: sidebar + content ---- */
+.shell .shell-body {
+  display: grid;
+  grid-template-columns: 212px 1fr;
+  flex: 1;
+  background: var(--color-ink);
+  min-height: 0;
+}
+.shell .side {
+  background: var(--surface-2);
+  border-right: 1px solid var(--line);
+  padding: 18px 12px;
+  display: flex;
+  flex-direction: column;
+}
+.shell .side-lbl {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--color-muted);
+  padding: 0 10px;
+  margin-bottom: 10px;
+}
+.shell .side-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-bottom: 2px;
+  line-height: 1.3;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+.shell .side-item:hover {
+  background: color-mix(in srgb, var(--color-brass) 6%, transparent);
+  color: var(--color-parchment);
+}
+.shell .side-item.active {
+  background: color-mix(in srgb, var(--color-brass) 12%, transparent);
+  color: var(--color-brass);
+}
+.shell .side-item .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.shell .side-empty {
+  padding: 0 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+.shell .side-new {
+  margin-top: auto;
+  padding-top: 16px;
+}
+.shell .shell-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  justify-content: center;
+  text-transform: uppercase;
+}
+.shell .shell-btn-primary {
+  background: var(--color-brass);
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.shell .shell-btn-primary:hover {
+  filter: brightness(1.08);
+}
+.shell .shell-btn-secondary {
+  background: transparent;
+  color: var(--color-parchment);
+  border-color: var(--line);
+}
+.shell .shell-btn-secondary:hover {
+  border-color: var(--color-brass);
+  color: var(--color-brass);
+}
+.shell .side-new .shell-btn {
+  width: 100%;
+}
+
+.shell .shell-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Content header — page title + page-scoped actions (Import / Log decision). */
+.shell .c-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 26px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.shell .c-head h1 {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--color-parchment);
+  line-height: 1.2;
+}
+.shell .c-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-muted);
+  margin-top: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.shell .c-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.shell .c-body {
+  padding: 26px;
+}
+
+/* Backdrop behind the mobile sidebar drawer. */
+.shell .side-backdrop {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .shell .shell-body {
+    grid-template-columns: 1fr;
+  }
+  .shell .tb-brand {
+    width: auto;
+  }
+  .shell .tb-brand span {
+    display: none;
+  }
+  .shell .tb-menu {
+    display: inline-flex;
+  }
+  /* Let the bar wrap: brand + account on row one, search on its own full-width
+     row, so nothing is pushed off-screen and search stays reachable. */
+  .shell .topbar {
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    padding: 12px 16px;
+  }
+  .shell .tb-search {
+    order: 3;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: 0 0 100%;
+    /* The scope toggle drops to its own line inside the field, so the bar can
+       never overflow the viewport; squared off since it's no longer a pill. */
+    flex-wrap: wrap;
+    row-gap: 8px;
+    border-radius: 12px;
+    padding: 8px 14px;
+  }
+  .shell .tb-search input {
+    font-size: 12px;
+  }
+  .shell .tb-scope {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+  }
+  /* Keep the submit arrow beside the input; only the scope drops to line two. */
+  .shell .tb-go {
+    order: 2;
+  }
+  .shell .tb-scope button {
+    padding: 5px 10px;
+  }
+  /* Sidebar collapses to an off-canvas drawer rather than crushing content. */
+  .shell .side {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: 240px;
+    transform: translateX(-100%);
+    transition: transform 180ms ease;
+  }
+  .shell .side.open {
+    transform: translateX(0);
+  }
+  .shell .side-backdrop.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(5, 8, 15, 0.6);
+  }
+  .shell .c-head {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 18px 16px;
+  }
+  .shell .c-body {
+    padding: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell .side,
+  .shell .side-item,
+  .shell .tb-search {
+    transition: none;
+  }
+}

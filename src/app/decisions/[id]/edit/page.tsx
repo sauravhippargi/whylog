@@ -2,9 +2,10 @@ import { redirect, notFound } from "next/navigation";
 
 import { auth } from "@/auth";
 import { getOwnedDecision } from "@/lib/decisions";
+import { getShellProjects } from "@/lib/shell";
 import { NotFoundError } from "@/lib/errors";
 import { toDateInputValue } from "@/lib/format";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { DecisionForm } from "@/components/DecisionForm";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -23,21 +24,24 @@ export default async function EditDecisionPage({ params }: PageProps) {
     throw error;
   }
 
+  const shellProjects = await getShellProjects(session.user.id);
+
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader
-        email={session.user.email}
-        back={{ href: `/decisions/${decision.id}`, label: decision.title }}
-      />
+    <AppShell
+      email={session.user.email}
+      projects={shellProjects}
+      currentProject={{ id: decision.project.id, name: decision.project.name }}
+    >
+      <div className="c-head">
+        <div className="min-w-0">
+          <h1>Edit decision</h1>
+          <p className="c-sub">{decision.title}</p>
+        </div>
+      </div>
 
-      <main className="mx-auto w-full max-w-2xl px-6 py-12">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          {decision.project.name}
-        </p>
-        <h1 className="mb-8 mt-2 font-serif text-3xl text-parchment">
-          Edit decision
-        </h1>
-
+      <div className="c-body mx-auto w-full max-w-2xl">
+        {/* The form's own Cancel returns to this decision — the sidebar covers
+            project-level navigation, so no header back-link is needed. */}
         <DecisionForm
           mode="edit"
           decisionId={decision.id}
@@ -53,7 +57,7 @@ export default async function EditDecisionPage({ params }: PageProps) {
             linksText: decision.links.join("\n"),
           }}
         />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

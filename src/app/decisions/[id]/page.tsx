@@ -4,9 +4,10 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getOwnedDecision, listDecisions } from "@/lib/decisions";
 import { relatedDecisions } from "@/lib/search";
+import { getShellProjects } from "@/lib/shell";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { DeleteDecisionButton } from "@/components/DeleteDecisionButton";
 import { SupersedeControl } from "@/components/SupersedeControl";
 import { EntryStamp } from "@/components/EntryStamp";
@@ -52,6 +53,7 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
 
   const entryId = decision.id.slice(-8).toUpperCase();
   const related = await relatedDecisions(session.user.id, id);
+  const shellProjects = await getShellProjects(session.user.id);
 
   // Other decisions in this project, for the supersede picker (excludes self).
   const supersedeOptions = (
@@ -65,13 +67,12 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
     }));
 
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader
-        email={session.user.email}
-        back={{ href: `/projects/${decision.project.id}`, label: decision.project.name }}
-      />
-
-      <main className="mx-auto w-full max-w-3xl px-6 py-12">
+    <AppShell
+      email={session.user.email}
+      projects={shellProjects}
+      currentProject={{ id: decision.project.id, name: decision.project.name }}
+    >
+      <div className="c-body mx-auto w-full max-w-3xl">
         <div className="flex items-start justify-between gap-4">
           <EntryStamp
             entryId={entryId}
@@ -239,7 +240,7 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
             </div>
           )}
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

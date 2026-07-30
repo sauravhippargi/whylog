@@ -4,9 +4,10 @@ import { redirect, notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { getOwnedProject } from "@/lib/projects";
 import { listDecisions } from "@/lib/decisions";
+import { getShellProjects } from "@/lib/shell";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { SupersededTag } from "@/components/SupersededTag";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -26,53 +27,50 @@ export default async function ProjectPage({ params }: PageProps) {
   }
 
   const decisions = await listDecisions(session.user.id, id);
+  const shellProjects = await getShellProjects(session.user.id);
+  const supersededCount = decisions.filter((d) => d.supersededById).length;
 
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader
-        email={session.user.email}
-        back={{ href: "/dashboard", label: "Projects" }}
-      />
-
-      <main className="mx-auto w-full max-w-3xl px-6 py-12">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="font-mono text-xs uppercase tracking-widest text-muted">
-              Project
-              {project.archivedAt && (
-                <span className="ml-2 text-verdigris">· Archived</span>
-              )}
-            </p>
-            <h1 className="mt-2 font-serif text-3xl text-parchment">
-              {project.name}
-            </h1>
-            {project.description && (
-              <p className="mt-2 font-serif text-muted">{project.description}</p>
+    <AppShell
+      email={session.user.email}
+      projects={shellProjects}
+      currentProject={{ id: project.id, name: project.name }}
+    >
+      {/* Page-scoped actions live here, not in the global top bar. */}
+      <div className="c-head">
+        <div className="min-w-0">
+          <h1>{project.name}</h1>
+          <p className="c-sub">
+            {decisions.length}{" "}
+            {decisions.length === 1 ? "decision" : "decisions"}
+            {supersededCount > 0 && ` · ${supersededCount} superseded`}
+            {project.archivedAt && (
+              <span className="text-verdigris"> · Archived</span>
             )}
-            <Link
-              href={`/search?projectId=${id}`}
-              className="mt-3 inline-block font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-brass-light"
-            >
-              Search →
-            </Link>
-          </div>
-          <div className="flex shrink-0 items-center gap-3">
-            <Link
-              href={`/projects/${id}/import`}
-              className="rounded-sm border border-brass/40 px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-brass-light transition-colors hover:border-brass"
-            >
-              Import
-            </Link>
-            <Link
-              href={`/projects/${id}/decisions/new`}
-              className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90"
-            >
-              Log decision
-            </Link>
-          </div>
+          </p>
         </div>
+        <div className="c-actions">
+          <Link
+            href={`/projects/${id}/import`}
+            className="shell-btn shell-btn-secondary"
+          >
+            Import
+          </Link>
+          <Link
+            href={`/projects/${id}/decisions/new`}
+            className="shell-btn shell-btn-primary"
+          >
+            + Log decision
+          </Link>
+        </div>
+      </div>
 
-        <section className="mt-10">
+      <div className="c-body">
+        {project.description && (
+          <p className="mb-6 font-serif text-muted">{project.description}</p>
+        )}
+
+        <section>
           {decisions.length === 0 ? (
             <div className="rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
               <p className="font-serif text-muted">
@@ -115,7 +113,7 @@ export default async function ProjectPage({ params }: PageProps) {
             </div>
           )}
         </section>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

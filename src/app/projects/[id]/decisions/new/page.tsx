@@ -2,8 +2,9 @@ import { redirect, notFound } from "next/navigation";
 
 import { auth } from "@/auth";
 import { getOwnedProject } from "@/lib/projects";
+import { getShellProjects } from "@/lib/shell";
 import { NotFoundError } from "@/lib/errors";
-import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { NewDecisionPanel } from "@/components/NewDecisionPanel";
 
 type PageProps = { params: Promise<{ id: string }> };
@@ -22,23 +23,24 @@ export default async function NewDecisionPage({ params }: PageProps) {
     throw error;
   }
 
+  const shellProjects = await getShellProjects(session.user.id);
+
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader
-        email={session.user.email}
-        back={{ href: `/projects/${id}`, label: project.name }}
-      />
+    <AppShell
+      email={session.user.email}
+      projects={shellProjects}
+      currentProject={{ id: project.id, name: project.name }}
+    >
+      <div className="c-head">
+        <div className="min-w-0">
+          <h1>Log a decision</h1>
+          <p className="c-sub">{project.name}</p>
+        </div>
+      </div>
 
-      <main className="mx-auto w-full max-w-2xl px-6 py-12">
-        <p className="font-mono text-xs uppercase tracking-widest text-muted">
-          {project.name}
-        </p>
-        <h1 className="mb-8 mt-2 font-serif text-3xl text-parchment">
-          Log a decision
-        </h1>
-
+      <div className="c-body mx-auto w-full max-w-2xl">
         <NewDecisionPanel projectId={id} />
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }
