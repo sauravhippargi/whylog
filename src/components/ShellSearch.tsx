@@ -36,7 +36,16 @@ export function ShellSearch({
   }
 
   return (
-    <form onSubmit={onSubmit} className="tb-search" role="search">
+    // action/method make this work before hydration (and with JS off): the
+    // browser's own GET lands on /search?q=… with the same shape router.push
+    // builds. Once hydrated, onSubmit preventDefaults and navigates client-side.
+    <form
+      onSubmit={onSubmit}
+      action="/search"
+      method="get"
+      className="tb-search"
+      role="search"
+    >
       <span className="q" aria-hidden="true">
         ?
       </span>
@@ -52,6 +61,10 @@ export function ShellSearch({
         }
         aria-label="Search your decisions"
       />
+      {/* Carries the scope through the no-JS fallback submission too. */}
+      {scoped && currentProject && (
+        <input type="hidden" name="projectId" value={currentProject.id} />
+      )}
       {currentProject && (
         <span className="tb-scope" role="group" aria-label="Search scope">
           <button
