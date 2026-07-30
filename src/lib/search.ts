@@ -32,6 +32,9 @@ export type SearchMatch = {
   decidedBy: string | null;
   decisionDate: Date;
   tags: string[];
+  // Set when a newer decision replaces this one — drives the superseded tag on
+  // result rows. Display only; it has no effect on ranking or synthesis.
+  supersededById: string | null;
   distance: number;
 };
 
@@ -106,6 +109,7 @@ export async function searchDecisions(
       d."decidedBy",
       d."decisionDate",
       d.tags,
+      d."supersededById",
       (d.embedding <=> ${literal}::vector) AS distance
     FROM "Decision" d
     JOIN "Project" p ON d."projectId" = p.id
@@ -161,6 +165,8 @@ export type RelatedDecision = {
   title: string;
   decisionDate: Date;
   tags: string[];
+  // Display only — drives the superseded tag on related rows (see SearchMatch).
+  supersededById: string | null;
   distance: number;
 };
 
@@ -182,6 +188,7 @@ export async function relatedDecisions(
       d.title,
       d."decisionDate",
       d.tags,
+      d."supersededById",
       (d.embedding <=> cur.embedding) AS distance
     FROM "Decision" d
     JOIN "Project" p ON d."projectId" = p.id

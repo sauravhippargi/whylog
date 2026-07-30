@@ -10,6 +10,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { DeleteDecisionButton } from "@/components/DeleteDecisionButton";
 import { SupersedeControl } from "@/components/SupersedeControl";
 import { EntryStamp } from "@/components/EntryStamp";
+import { SupersededTag } from "@/components/SupersededTag";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -215,9 +216,18 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
                     {formatStamp(r.decisionDate)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-serif text-sm text-parchment transition-colors group-hover:text-brass-light">
-                      {r.title}
-                    </p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <p
+                        className={`truncate font-serif text-sm transition-colors group-hover:text-brass-light ${
+                          r.supersededById
+                            ? "text-parchment/70"
+                            : "text-parchment"
+                        }`}
+                      >
+                        {r.title}
+                      </p>
+                      {r.supersededById && <SupersededTag />}
+                    </div>
                     {r.tags.length > 0 && (
                       <p className="truncate font-mono text-[10px] uppercase tracking-widest text-muted">
                         {r.tags.join(" · ")}

@@ -7,6 +7,7 @@ import { listDecisions } from "@/lib/decisions";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
 import { AppHeader } from "@/components/AppHeader";
+import { SupersededTag } from "@/components/SupersededTag";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -90,9 +91,19 @@ export default async function ProjectPage({ params }: PageProps) {
                     {formatStamp(decision.decisionDate)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-serif text-parchment transition-colors group-hover:text-brass-light">
-                      {decision.title}
-                    </p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      {/* Superseded entries read as historical at a glance. */}
+                      <p
+                        className={`truncate font-serif transition-colors group-hover:text-brass-light ${
+                          decision.supersededById
+                            ? "text-parchment/70"
+                            : "text-parchment"
+                        }`}
+                      >
+                        {decision.title}
+                      </p>
+                      {decision.supersededById && <SupersededTag />}
+                    </div>
                     {decision.tags.length > 0 && (
                       <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-widest text-muted">
                         {decision.tags.join(" · ")}

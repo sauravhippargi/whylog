@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 
 import { formatStamp } from "@/lib/format";
+import { SupersededTag } from "@/components/SupersededTag";
 
 type SearchMatch = {
   id: string;
@@ -13,6 +14,7 @@ type SearchMatch = {
   decisionSummary: string;
   decisionDate: string; // ISO string over the wire
   tags: string[];
+  supersededById: string | null;
   distance: number;
 };
 
@@ -143,9 +145,18 @@ export function SearchPanel({
                     {formatStamp(new Date(m.decisionDate))}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-serif text-parchment transition-colors group-hover:text-brass-light">
-                      {m.title}
-                    </p>
+                    <div className="flex min-w-0 items-center gap-2">
+                      <p
+                        className={`truncate font-serif transition-colors group-hover:text-brass-light ${
+                          m.supersededById
+                            ? "text-parchment/70"
+                            : "text-parchment"
+                        }`}
+                      >
+                        {m.title}
+                      </p>
+                      {m.supersededById && <SupersededTag />}
+                    </div>
                     <p className="mt-1 truncate font-mono text-[10px] uppercase tracking-widest text-muted">
                       {m.projectName}
                       {m.tags.length > 0 && ` · ${m.tags.join(" · ")}`}
