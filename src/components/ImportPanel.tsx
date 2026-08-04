@@ -309,17 +309,22 @@ export function ImportPanel({ projectId }: { projectId: string }) {
                     Candidate {index + 1}
                     {rejected && " · Rejected"}
                   </span>
+                  {/* Secondary/outline pills, same language as the upload
+                      control — deliberately not filled, so neither competes
+                      with "Commit accepted" for weight. */}
                   {rejected ? (
                     <button
+                      type="button"
                       onClick={() => setStatus(it.key, "accepted")}
-                      className="font-mono text-[10px] uppercase tracking-widest text-muted transition-colors hover:text-brass-light"
+                      className={SECONDARY_PILL}
                     >
                       Restore
                     </button>
                   ) : (
                     <button
+                      type="button"
                       onClick={() => setStatus(it.key, "rejected")}
-                      className="font-mono text-[10px] uppercase tracking-widest text-muted transition-colors hover:text-brass-light"
+                      className={SECONDARY_PILL}
                     >
                       Reject
                     </button>

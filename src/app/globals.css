@@ -1020,6 +1020,55 @@ html {
   gap: 10px;
   flex-shrink: 0;
 }
+/* Breadcrumb strip — sits in the content header, above the record itself. */
+.shell .c-crumbs {
+  padding: 14px 26px;
+  border-bottom: 1px solid var(--line);
+}
+.shell .crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.shell .crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.shell .crumbs a,
+.shell .crumbs .current {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.shell .crumbs a {
+  color: var(--color-muted);
+  transition: color 0.15s;
+}
+.shell .crumbs a:hover {
+  color: var(--color-brass);
+}
+.shell .crumbs .current {
+  color: var(--color-parchment);
+  /* Decision titles can run long; keep the strip to one line. */
+  max-width: 46ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell .crumbs .sep {
+  color: color-mix(in srgb, var(--color-muted) 55%, transparent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 .shell .c-body {
   padding: 26px;
 }
@@ -1105,6 +1154,12 @@ html {
   }
   .shell .c-body {
     padding: 18px;
+  }
+  .shell .c-crumbs {
+    padding: 12px 18px;
+  }
+  .shell .crumbs .current {
+    max-width: 22ch;
   }
 }
 

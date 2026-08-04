@@ -8,6 +8,7 @@ import { getShellProjects } from "@/lib/shell";
 import { NotFoundError } from "@/lib/errors";
 import { formatStamp } from "@/lib/format";
 import { AppShell } from "@/components/AppShell";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { DeleteDecisionButton } from "@/components/DeleteDecisionButton";
 import { SupersedeControl } from "@/components/SupersedeControl";
 import { EntryStamp } from "@/components/EntryStamp";
@@ -72,6 +73,21 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
       projects={shellProjects}
       currentProject={{ id: decision.project.id, name: decision.project.name }}
     >
+      {/* Hierarchy + parent context. The project name comes from the existing
+          getOwnedDecision join, so no extra query is needed. */}
+      <div className="c-crumbs">
+        <Breadcrumbs
+          items={[
+            { label: "Projects", href: "/dashboard" },
+            {
+              label: decision.project.name,
+              href: `/projects/${decision.project.id}`,
+            },
+            { label: decision.title },
+          ]}
+        />
+      </div>
+
       <div className="c-body mx-auto w-full max-w-3xl">
         <div className="flex items-start justify-between gap-4">
           <EntryStamp
