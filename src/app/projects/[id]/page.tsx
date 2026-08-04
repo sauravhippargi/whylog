@@ -72,18 +72,18 @@ export default async function ProjectPage({ params }: PageProps) {
 
         <section>
           {decisions.length === 0 ? (
-            <div className="rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
+            <div className="rounded-md border border-dashed border-rule bg-surface p-10 text-center">
               <p className="font-serif text-muted">
                 No decisions logged yet for this project.
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-md border border-white/10">
+            <div className="overflow-hidden rounded-md border border-rule">
               {decisions.map((decision) => (
                 <Link
                   key={decision.id}
                   href={`/decisions/${decision.id}`}
-                  className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 last:border-b-0"
+                  className="ledger-row group flex items-baseline gap-4 border-b border-rule-soft px-4 py-3 last:border-b-0"
                 >
                   <span className="shrink-0 font-mono text-xs text-muted">
                     {formatStamp(decision.decisionDate)}

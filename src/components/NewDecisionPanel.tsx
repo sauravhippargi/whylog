@@ -74,7 +74,7 @@ export function NewDecisionPanel({ projectId }: { projectId: string }) {
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="rounded-md border border-white/10 bg-surface p-5">
+      <section className="rounded-md border border-rule bg-surface p-5">
         <p className="mb-1 font-mono text-xs uppercase tracking-widest text-muted">
           Draft from pasted text
         </p>
@@ -87,7 +87,7 @@ export function NewDecisionPanel({ projectId }: { projectId: string }) {
           onChange={(e) => setRawText(e.target.value)}
           rows={6}
           placeholder="Paste source text…"
-          className="w-full rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass"
+          className="w-full rounded-sm border border-rule bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass"
         />
         {error && (
           <p role="alert" className="mt-2 font-mono text-xs text-brass-light">
@@ -105,7 +105,7 @@ export function NewDecisionPanel({ projectId }: { projectId: string }) {
           <button
             onClick={onDraft}
             disabled={drafting || rawText.trim().length === 0}
-            className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-sm bg-brass-fill px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {drafting ? "Drafting…" : "Draft with AI"}
           </button>

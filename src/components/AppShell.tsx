@@ -6,6 +6,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 
 import { ShellSearch } from "@/components/ShellSearch";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export type ShellProject = { id: string; name: string };
 
@@ -91,6 +92,7 @@ export function AppShell({
             {menuOpen && (
               <div className="tb-menu-pop">
                 <span className="email">{email}</span>
+                <ThemeToggle />
                 <button type="button" onClick={() => signOut({ redirectTo: "/" })}>
                   Sign out
                 </button>

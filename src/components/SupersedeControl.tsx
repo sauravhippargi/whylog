@@ -74,7 +74,7 @@ export function SupersedeControl({
         value={selected}
         onChange={(e) => setSelected(e.target.value)}
         aria-label="Superseded by"
-        className="max-w-full rounded-sm border border-white/10 bg-ink px-2 py-1.5 font-mono text-xs text-parchment outline-none focus:border-brass"
+        className="max-w-full rounded-sm border border-rule bg-ink px-2 py-1.5 font-mono text-xs text-parchment outline-none focus:border-brass"
       >
         <option value="">— Not superseded —</option>
         {options.map((o) => (
@@ -94,7 +94,7 @@ export function SupersedeControl({
         <button
           onClick={() => apply(selected ? selected : null)}
           disabled={pending}
-          className="rounded-sm bg-brass px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-sm bg-brass-fill px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {pending ? "Saving…" : "Save"}
         </button>

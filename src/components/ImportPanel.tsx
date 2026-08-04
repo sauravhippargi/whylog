@@ -48,7 +48,7 @@ function toArray(text: string, separator: "," | "\n"): string[] {
 
 const labelClass = "font-mono text-[10px] uppercase tracking-widest text-muted";
 const fieldClass =
-  "w-full rounded-sm border border-white/10 bg-ink px-2 py-1.5 font-serif text-sm text-parchment outline-none placeholder:text-muted/50 focus:border-brass";
+  "w-full rounded-sm border border-rule bg-ink px-2 py-1.5 font-serif text-sm text-parchment outline-none placeholder:text-muted/50 focus:border-brass";
 
 export function ImportPanel({ projectId }: { projectId: string }) {
   const router = useRouter();
@@ -198,7 +198,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
           <div className="flex items-center gap-3">
             <span
               aria-hidden
-              className="seal-drop inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-brass/70 bg-brass/10 text-xs text-brass"
+              className="seal-drop inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-brass/70 bg-brass-tint text-xs text-brass"
             >
               ◈
             </span>
@@ -217,7 +217,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
         </div>
       )}
 
-      <section className="rounded-md border border-white/10 bg-surface p-5">
+      <section className="rounded-md border border-rule bg-surface p-5">
         <p className="mb-1 font-mono text-xs uppercase tracking-widest text-muted">
           Import from a document
         </p>
@@ -231,7 +231,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
           onChange={(e) => setRawDoc(e.target.value)}
           rows={8}
           placeholder="Paste document text…"
-          className="w-full rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass"
+          className="w-full rounded-sm border border-rule bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass"
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <PasteFromClipboardButton
@@ -262,7 +262,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
           <button
             onClick={onExtract}
             disabled={extracting || rawDoc.trim().length === 0}
-            className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-sm bg-brass-fill px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {extracting ? "Extracting…" : "Extract decisions"}
           </button>
@@ -289,7 +289,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
             <button
               onClick={onCommit}
               disabled={committing || acceptedCount === 0}
-              className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-sm bg-brass-fill px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {committing
                 ? "Committing…"
@@ -302,7 +302,7 @@ export function ImportPanel({ projectId }: { projectId: string }) {
             return (
               <div
                 key={it.key}
-                className={`rounded-md border p-4 ${rejected ? "border-white/5 opacity-50" : "border-white/10 bg-surface"}`}
+                className={`rounded-md border p-4 ${rejected ? "border-rule-soft opacity-50" : "border-rule bg-surface"}`}
               >
                 <div className="mb-3 flex items-center justify-between">
                   <span className="font-mono text-[10px] uppercase tracking-widest text-muted">

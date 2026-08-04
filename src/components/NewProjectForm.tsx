@@ -42,7 +42,7 @@ export function NewProjectForm() {
   return (
     <form
       onSubmit={onSubmit}
-      className="rounded-md border border-white/10 bg-surface p-5"
+      className="rounded-md border border-rule bg-surface p-5"
       noValidate
     >
       <p className="mb-3 font-mono text-xs uppercase tracking-widest text-muted">
@@ -56,7 +56,7 @@ export function NewProjectForm() {
           placeholder="Project name"
           maxLength={100}
           required
-          className="rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
+          className="rounded-sm border border-rule bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
         />
         <input
           name="description"
@@ -64,7 +64,7 @@ export function NewProjectForm() {
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Description (optional)"
           maxLength={500}
-          className="rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-sm text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
+          className="rounded-sm border border-rule bg-ink px-3 py-2 font-serif text-sm text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
         />
 
         {error && (
@@ -77,7 +77,7 @@ export function NewProjectForm() {
           <button
             type="submit"
             disabled={pending || name.trim().length === 0}
-            className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="rounded-sm bg-brass-fill px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             {pending ? "Creating…" : "Create project"}
           </button>

@@ -88,7 +88,7 @@ export function SearchPanel({
 
   if (state.kind === "idle") {
     return (
-      <div className="rounded-md border border-dashed border-white/10 bg-surface p-8 text-center">
+      <div className="rounded-md border border-dashed border-rule bg-surface p-8 text-center">
         <p className="font-serif text-muted">
           Ask a question in plain language using the search bar above. Search
           runs across all your projects unless you narrow it to one.
@@ -129,7 +129,7 @@ export function SearchPanel({
         <p className="whitespace-pre-wrap font-serif text-lg leading-relaxed text-parchment">
           {result.answer}
         </p>
-        <p className="mt-4 border-t border-white/10 pt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
+        <p className="mt-4 border-t border-rule pt-3 font-mono text-[10px] uppercase tracking-widest text-muted">
           Drawn from: {result.matches.map((m) => m.title).join(" · ")}
         </p>
       </div>
@@ -139,12 +139,12 @@ export function SearchPanel({
         <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted">
           Matched entries
         </p>
-        <div className="overflow-hidden rounded-md border border-white/10">
+        <div className="overflow-hidden rounded-md border border-rule">
           {result.matches.map((m) => (
             <Link
               key={m.id}
               href={`/decisions/${m.id}`}
-              className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3 last:border-b-0"
+              className="ledger-row group flex items-baseline gap-4 border-b border-rule-soft px-4 py-3 last:border-b-0"
             >
               <span className="shrink-0 font-mono text-xs text-muted">
                 {formatStamp(new Date(m.decisionDate))}

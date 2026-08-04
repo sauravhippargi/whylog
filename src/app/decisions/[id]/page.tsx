@@ -28,7 +28,7 @@ function LedgerLine({
   children: React.ReactNode;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-1 border-b border-white/5 py-4 sm:grid-cols-[8rem_1fr] sm:gap-4">
+    <div className="grid grid-cols-1 gap-1 border-b border-rule-soft py-4 sm:grid-cols-[8rem_1fr] sm:gap-4">
       <span className="pt-0.5 font-mono text-xs uppercase tracking-widest text-muted">
         {label}
       </span>
@@ -116,7 +116,7 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
         {/* Supersession — bidirectional brass-seal / verdigris badges + control. */}
         <div className="mt-4 flex flex-col items-start gap-3">
           {decision.supersededBy && (
-            <div className="inline-flex items-center gap-2 rounded-sm border border-brass/50 bg-brass/10 px-3 py-1.5">
+            <div className="inline-flex items-center gap-2 rounded-sm border border-brass/50 bg-brass-tint px-3 py-1.5">
               <span className="font-mono text-[10px] uppercase tracking-widest text-brass">
                 ◈ Superseded by
               </span>
@@ -179,7 +179,7 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
                 {decision.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-sm border border-white/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted"
+                    className="rounded-sm border border-rule px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-muted"
                   >
                     {tag}
                   </span>
@@ -222,12 +222,12 @@ export default async function DecisionPage({ params, searchParams }: PageProps) 
               No related entries yet.
             </p>
           ) : (
-            <div className="overflow-hidden rounded-md border border-white/10">
+            <div className="overflow-hidden rounded-md border border-rule">
               {related.map((r) => (
                 <Link
                   key={r.id}
                   href={`/decisions/${r.id}`}
-                  className="ledger-row group flex items-baseline gap-3 border-b border-white/5 px-3 py-2 last:border-b-0"
+                  className="ledger-row group flex items-baseline gap-3 border-b border-rule-soft px-3 py-2 last:border-b-0"
                 >
                   <span className="shrink-0 font-mono text-[11px] text-muted">
                     {formatStamp(r.decisionDate)}

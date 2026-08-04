@@ -33,7 +33,7 @@ export const EMPTY_DECISION_FORM: DecisionFormValues = {
 const labelClass =
   "font-mono text-xs uppercase tracking-widest text-muted";
 const inputClass =
-  "rounded-sm border border-white/10 bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass";
+  "rounded-sm border border-rule bg-ink px-3 py-2 font-serif text-parchment outline-none placeholder:text-muted/50 focus:border-brass";
 
 export function DecisionForm(props: DecisionFormProps) {
   const router = useRouter();
@@ -206,7 +206,7 @@ export function DecisionForm(props: DecisionFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="rounded-sm bg-brass px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-sm bg-brass-fill px-4 py-2 font-mono text-xs font-medium uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {pending
             ? props.mode === "create"

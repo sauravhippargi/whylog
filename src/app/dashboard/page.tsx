@@ -41,13 +41,13 @@ export default async function DashboardPage() {
 
         <section className="mt-8">
           {active.length === 0 ? (
-            <div className="rounded-md border border-dashed border-white/10 bg-surface p-10 text-center">
+            <div className="rounded-md border border-dashed border-rule bg-surface p-10 text-center">
               <p className="font-serif text-muted">
                 No projects yet. Create one to start logging decisions.
               </p>
             </div>
           ) : (
-            <div className="overflow-hidden rounded-md border border-white/10">
+            <div className="overflow-hidden rounded-md border border-rule">
               {active.map((project) => (
                 <ProjectRow
                   key={project.id}
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
             <p className="mb-2 font-mono text-xs uppercase tracking-widest text-muted">
               Archived
             </p>
-            <div className="overflow-hidden rounded-md border border-white/10">
+            <div className="overflow-hidden rounded-md border border-rule">
               {archived.map((project) => (
                 <ProjectRow
                   key={project.id}

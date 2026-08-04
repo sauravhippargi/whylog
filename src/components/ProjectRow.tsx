@@ -76,7 +76,7 @@ export function ProjectRow({
   // unarchive in Phase 1).
   if (archived) {
     return (
-      <div className="flex items-baseline gap-4 border-b border-white/5 px-4 py-3 opacity-60">
+      <div className="flex items-baseline gap-4 border-b border-rule-soft px-4 py-3 opacity-60">
         <span className="shrink-0 font-mono text-xs text-muted">{dateStamp}</span>
         <div className="min-w-0 flex-1">
           <Link
@@ -98,14 +98,14 @@ export function ProjectRow({
 
   if (mode === "edit") {
     return (
-      <div className="border-b border-white/5 bg-surface/40 px-4 py-3">
+      <div className="border-b border-rule-soft bg-surface/40 px-4 py-3">
         <div className="flex flex-col gap-2">
           <input
             value={draftName}
             onChange={(e) => setDraftName(e.target.value)}
             maxLength={100}
             aria-label="Project name"
-            className="rounded-sm border border-white/10 bg-ink px-2 py-1.5 font-serif text-parchment outline-none focus:border-brass"
+            className="rounded-sm border border-rule bg-ink px-2 py-1.5 font-serif text-parchment outline-none focus:border-brass"
           />
           <input
             value={draftDescription}
@@ -113,7 +113,7 @@ export function ProjectRow({
             maxLength={500}
             placeholder="Description (optional)"
             aria-label="Project description"
-            className="rounded-sm border border-white/10 bg-ink px-2 py-1.5 font-serif text-sm text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
+            className="rounded-sm border border-rule bg-ink px-2 py-1.5 font-serif text-sm text-parchment outline-none placeholder:text-muted/60 focus:border-brass"
           />
           {error && (
             <p role="alert" className="font-mono text-xs text-brass-light">
@@ -124,7 +124,7 @@ export function ProjectRow({
             <button
               onClick={save}
               disabled={pending || draftName.trim().length === 0}
-              className="rounded-sm bg-brass px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-ink transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="rounded-sm bg-brass-fill px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-on-brass transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {pending ? "Saving…" : "Save"}
             </button>
@@ -136,7 +136,7 @@ export function ProjectRow({
                 setMode("view");
               }}
               disabled={pending}
-              className="rounded-sm border border-white/10 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-brass hover:text-brass-light"
+              className="rounded-sm border border-rule px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:border-brass hover:text-brass-light"
             >
               Cancel
             </button>
@@ -147,7 +147,7 @@ export function ProjectRow({
   }
 
   return (
-    <div className="ledger-row group flex items-baseline gap-4 border-b border-white/5 px-4 py-3">
+    <div className="ledger-row group flex items-baseline gap-4 border-b border-rule-soft px-4 py-3">
       <span className="shrink-0 font-mono text-xs text-muted">{dateStamp}</span>
       <div className="min-w-0 flex-1">
         <Link

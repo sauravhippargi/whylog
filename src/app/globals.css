@@ -1,25 +1,94 @@
 @import "tailwindcss";
 
 /*
- * WhyLog design tokens (see design.md). v1 is dark-mode only — an archival,
- * ship's-log aesthetic: ink background, parchment text, one brass accent.
+ * WhyLog design tokens (see design.md).
+ *
+ * Two palettes, one identity: dark is the default and primary mode, light is
+ * the same identity inverted onto warm paper. Typography, ledger structure,
+ * spacing, radii and the stamp motif are shared — only these values change.
+ *
+ * Tokens are named by ROLE, not by literal colour, so a single set of utilities
+ * serves both modes: `--color-ink` is always "page background" (Ink in dark,
+ * Paper in light) and `--color-parchment` is always "primary text" (Parchment
+ * in dark, Ink-text in light). The `.light` overrides below sit on <html>, so
+ * they outrank Tailwind's `:root` defaults and every `bg-ink` / `text-parchment`
+ * / `border-brass/40` utility re-resolves automatically.
+ *
+ * Brass is split by USE because light mode cannot reuse one brass for both
+ * (design.md): `--color-brass` is accent text + small elements, and
+ * `--color-brass-fill` is filled buttons and larger areas. In dark both are
+ * #C89B4A, so dark output is unchanged.
  */
 @theme {
-  --color-ink: #0b1220;
-  --color-surface: #141d2e;
-  --color-parchment: #ede6d6;
-  --color-muted: #7c8aa0;
-  --color-brass: #c89b4a;
+  /* --- Dark mode (default) --- */
+  --color-ink: #0b1220; /* page background */
+  --color-surface: #141d2e; /* card / panel */
+  --color-surface-2: #0f1626; /* recessed wells (derived, not in design.md) */
+  --color-parchment: #ede6d6; /* primary text */
+  --color-muted: #7c8aa0; /* secondary text, timestamps */
+  --color-brass: #c89b4a; /* accent TEXT + small elements */
+  --color-brass-fill: #c89b4a; /* filled buttons / larger areas */
   /* Lightened brass for small interactive text (contrast headroom on ink). */
   --color-brass-light: #e0b968;
+  --color-on-brass: #0b1220; /* text sitting on a brass fill */
   --color-verdigris: #3f7a6e;
+
+  /* Borders. Dark uses a parchment veil; light uses design.md's Rule token. */
+  --color-rule: rgba(237, 230, 214, 0.1);
+  --color-rule-soft: rgba(237, 230, 214, 0.05);
+  --color-line: rgba(200, 155, 74, 0.18); /* brass-tinted chrome divider */
+
+  --color-scrim: rgba(5, 8, 15, 0.6); /* mobile drawer backdrop */
+  --color-nav-bg: rgba(11, 18, 32, 0.88); /* translucent landing nav */
+  --color-shadow: rgba(0, 0, 0, 0.45);
+  --color-brass-veil: rgba(200, 155, 74, 0.12); /* input focus halo */
+  /* Wash behind brass badges / active nav states. Kept light enough in each
+     mode that brass TEXT sitting on it still clears AA (measured, not assumed). */
+  --color-brass-tint: color-mix(in srgb, #c89b4a 10%, transparent);
 
   --font-mono: var(--font-plex-mono), ui-monospace, "SFMono-Regular", monospace;
   --font-serif: var(--font-source-serif), Georgia, "Times New Roman", serif;
 }
 
+/*
+ * --- Light mode ---
+ * Hexes are exactly design.md's light table, including its measured-ratios
+ * table: Ink text on brass fills (4.51:1), never white (3.53:1, fails AA).
+ * `--color-surface-2`, the scrim/nav/shadow veils and `--color-rule-soft`
+ * aren't in that table; they're derived from tokens that are.
+ */
+html.light {
+  --color-ink: #fbfaf7; /* Paper */
+  --color-surface: #f3f1ec; /* Surface */
+  /* Recessed wells. Kept only a hair under Surface so Muted still clears AA on
+     it (4.57:1); the original #EDEAE2 dropped it to 4.41:1. */
+  --color-surface-2: #f0eee8;
+  --color-parchment: #1c2230; /* Ink (text) */
+  --color-muted: #706b60; /* Muted */
+  --color-brass: #8a5e1a; /* Brass (dark) — text + small elements */
+  --color-brass-fill: #b47e28; /* Brass (fill) — filled buttons */
+  --color-brass-light: #8a5e1a; /* accent text converges on Brass (dark) */
+  --color-on-brass: #1c2230;
+  --color-verdigris: #2e5c53; /* Verdigris (dark) */
+
+  --color-rule: #e4e0d8; /* Rule */
+  --color-rule-soft: color-mix(in srgb, #e4e0d8 55%, transparent);
+  --color-line: #e4e0d8;
+
+  --color-scrim: rgba(28, 34, 48, 0.35);
+  --color-nav-bg: rgba(251, 250, 247, 0.9);
+  --color-shadow: rgba(28, 34, 48, 0.14);
+  --color-brass-veil: rgba(138, 94, 26, 0.14);
+  /* Opaque, very light warm wash: a translucent brass tint would darken the
+     backdrop enough to drop Brass(dark) text under 4.5:1. */
+  --color-brass-tint: color-mix(in srgb, #b47e28 6%, #fbfaf7);
+}
+
 html {
   color-scheme: dark;
+}
+html.light {
+  color-scheme: light;
 }
 
 body {
@@ -113,8 +182,6 @@ html {
 }
 
 .landing {
-  --surface-2: #0f1626;
-  --line: rgba(200, 155, 74, 0.18);
   line-height: 1.5;
 }
 .landing .mono {
@@ -134,9 +201,9 @@ html {
   align-items: center;
   justify-content: space-between;
   padding: 18px 40px;
-  background: rgba(11, 18, 32, 0.88);
+  background: var(--color-nav-bg);
   backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 .landing .brand {
   display: flex;
@@ -204,7 +271,7 @@ html {
   font-size: 12px;
   letter-spacing: 0.08em;
   color: var(--color-brass);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
   padding-bottom: 2px;
 }
 .landing .see-how:hover {
@@ -214,7 +281,7 @@ html {
 /* ---- Auth card ---- */
 .landing .auth-card {
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
   padding: 36px;
 }
@@ -222,7 +289,7 @@ html {
   display: flex;
   gap: 2px;
   margin-bottom: 28px;
-  background: var(--surface-2);
+  background: var(--color-surface-2);
   border-radius: 3px;
   padding: 3px;
 }
@@ -256,8 +323,8 @@ html {
 }
 .landing input {
   width: 100%;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
   border-radius: 3px;
   padding: 11px 12px;
   color: var(--color-parchment);
@@ -267,7 +334,7 @@ html {
 .landing input:focus {
   outline: none;
   border-color: var(--color-brass);
-  box-shadow: 0 0 0 3px rgba(200, 155, 74, 0.12);
+  box-shadow: 0 0 0 3px var(--color-brass-veil);
 }
 .landing .submit {
   width: 100%;
@@ -275,8 +342,8 @@ html {
   padding: 12px;
   border: none;
   border-radius: 3px;
-  background: var(--color-brass);
-  color: var(--color-ink);
+  background: var(--color-brass-fill);
+  color: var(--color-on-brass);
   font-family: var(--font-mono);
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -323,7 +390,7 @@ html {
 }
 .landing .demo-box {
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
   padding: 28px;
   text-align: left;
@@ -332,8 +399,8 @@ html {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-line);
   border-radius: 3px;
   padding: 12px 14px;
   margin-bottom: 18px;
@@ -352,7 +419,7 @@ html {
   display: inline-block;
   width: 2px;
   height: 16px;
-  background: var(--color-brass);
+  background: var(--color-brass-fill);
   margin-left: 1px;
   animation: blink 1s step-end infinite;
 }
@@ -389,7 +456,7 @@ html {
   font-size: 10px;
   letter-spacing: 0.04em;
   color: var(--color-muted);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-line);
   padding-top: 12px;
 }
 
@@ -418,12 +485,12 @@ html {
 }
 .landing .chart-box {
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
   padding: 12px;
 }
 .landing .grid {
-  stroke: var(--line);
+  stroke: var(--color-line);
   stroke-width: 1;
 }
 .landing .grid circle,
@@ -515,7 +582,7 @@ html {
   display: inline-block;
 }
 .landing .legend-swatch.brass {
-  background: var(--color-brass);
+  background: var(--color-brass-fill);
 }
 .landing .legend-swatch.verdigris {
   background: var(--color-verdigris);
@@ -551,7 +618,7 @@ html {
 }
 .landing .path-card {
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
   padding: 26px;
   transition:
@@ -568,7 +635,7 @@ html {
   font-size: 10px;
   letter-spacing: 0.1em;
   color: var(--color-brass);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 2px;
   padding: 4px 8px;
   margin-bottom: 16px;
@@ -593,7 +660,7 @@ html {
 }
 .landing .cta-inner {
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 4px;
   padding: 48px;
   text-align: center;
@@ -611,8 +678,8 @@ html {
 .landing .cta-btn {
   display: inline-block;
   padding: 12px 28px;
-  background: var(--color-brass);
-  color: var(--color-ink);
+  background: var(--color-brass-fill);
+  color: var(--color-on-brass);
   border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 12px;
@@ -627,7 +694,7 @@ html {
 
 /* ---- Footer ---- */
 .landing footer {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-line);
   padding: 28px 40px;
   display: flex;
   align-items: center;
@@ -687,8 +754,6 @@ html {
  * redefine the global `.ledger-row` used by the decision lists.
  * ============================================================ */
 .shell {
-  --surface-2: #0f1626;
-  --line: rgba(200, 155, 74, 0.18);
   display: flex;
   min-height: 100vh;
   flex-direction: column;
@@ -703,8 +768,8 @@ html {
   align-items: center;
   gap: 18px;
   padding: 13px 22px;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--line);
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-line);
 }
 .shell .tb-brand {
   display: flex;
@@ -731,7 +796,7 @@ html {
   width: 30px;
   height: 30px;
   flex-shrink: 0;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 6px;
   background: transparent;
   color: var(--color-muted);
@@ -751,7 +816,7 @@ html {
   gap: 12px;
   padding: 8px 17px;
   background: var(--color-ink);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 24px;
   transition: border-color 0.15s;
 }
@@ -784,7 +849,7 @@ html {
   flex-shrink: 0;
   gap: 2px;
   padding: 2px;
-  background: var(--surface-2);
+  background: var(--color-surface-2);
   border-radius: 20px;
 }
 .shell .tb-scope button {
@@ -801,7 +866,7 @@ html {
   white-space: nowrap;
 }
 .shell .tb-scope button.on {
-  background: color-mix(in srgb, var(--color-brass) 16%, transparent);
+  background: var(--color-brass-tint);
   color: var(--color-brass);
 }
 .shell .tb-go {
@@ -851,10 +916,10 @@ html {
   top: calc(100% + 8px);
   min-width: 200px;
   background: var(--color-surface);
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 6px;
   padding: 6px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 18px 40px var(--color-shadow);
 }
 .shell .tb-menu-pop .email {
   display: block;
@@ -863,9 +928,49 @@ html {
   font-size: 11px;
   color: var(--color-muted);
   word-break: break-all;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
   margin-bottom: 4px;
 }
+/* Theme switch inside the account dropdown. */
+.shell .tb-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px 8px;
+}
+.shell .tb-theme-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+}
+.shell .tb-theme-options {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-surface-2);
+  border-radius: 20px;
+}
+.shell .tb-theme-options button {
+  width: auto;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 18px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+.shell .tb-theme-options button.on {
+  background: var(--color-brass-tint);
+  color: var(--color-brass);
+}
+
 .shell .tb-menu-pop button {
   width: 100%;
   text-align: left;
@@ -894,8 +999,8 @@ html {
   min-height: 0;
 }
 .shell .side {
-  background: var(--surface-2);
-  border-right: 1px solid var(--line);
+  background: var(--color-surface-2);
+  border-right: 1px solid var(--color-line);
   padding: 18px 12px;
   display: flex;
   flex-direction: column;
@@ -928,7 +1033,7 @@ html {
   color: var(--color-parchment);
 }
 .shell .side-item.active {
-  background: color-mix(in srgb, var(--color-brass) 12%, transparent);
+  background: var(--color-brass-tint);
   color: var(--color-brass);
 }
 .shell .side-item .dot {
@@ -965,8 +1070,8 @@ html {
   text-transform: uppercase;
 }
 .shell .shell-btn-primary {
-  background: var(--color-brass);
-  color: var(--color-ink);
+  background: var(--color-brass-fill);
+  color: var(--color-on-brass);
   font-weight: 600;
 }
 .shell .shell-btn-primary:hover {
@@ -975,7 +1080,7 @@ html {
 .shell .shell-btn-secondary {
   background: transparent;
   color: var(--color-parchment);
-  border-color: var(--line);
+  border-color: var(--color-line);
 }
 .shell .shell-btn-secondary:hover {
   border-color: var(--color-brass);
@@ -998,7 +1103,7 @@ html {
   justify-content: space-between;
   gap: 20px;
   padding: 22px 26px 20px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 .shell .c-head h1 {
   font-family: var(--font-serif);
@@ -1023,7 +1128,7 @@ html {
 /* Breadcrumb strip — sits in the content header, above the record itself. */
 .shell .c-crumbs {
   padding: 14px 26px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--color-line);
 }
 .shell .crumbs ol {
   display: flex;
@@ -1064,9 +1169,14 @@ html {
   white-space: nowrap;
 }
 .shell .crumbs .sep {
+  /* Dimmer than the links by design. The 55% mix reads fine on ink but lands at
+     1.86:1 on paper, so light mode uses full Muted instead. */
   color: color-mix(in srgb, var(--color-muted) 55%, transparent);
   font-family: var(--font-mono);
   font-size: 11px;
+}
+html.light .shell .crumbs .sep {
+  color: var(--color-muted);
 }
 
 .shell .c-body {
@@ -1145,7 +1255,7 @@ html {
     position: fixed;
     inset: 0;
     z-index: 40;
-    background: rgba(5, 8, 15, 0.6);
+    background: var(--color-scrim);
   }
   .shell .c-head {
     flex-direction: column;

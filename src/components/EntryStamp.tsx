@@ -53,7 +53,7 @@ export function EntryStamp({
       <span>Entry {entryId} ·</span>
       <span
         aria-hidden
-        className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-brass/70 bg-brass/10 text-[9px] leading-none text-brass ${animate ? "seal-drop" : ""}`}
+        className={`inline-flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border border-brass/70 bg-brass-tint text-[9px] leading-none text-brass ${animate ? "seal-drop" : ""}`}
       >
         ◈
       </span>

@@ -5,7 +5,7 @@
 // doing the superseding carries no indicator in list views.
 export function SupersededTag() {
   return (
-    <span className="inline-flex shrink-0 items-center rounded-sm border border-brass/50 bg-brass/10 px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-brass">
+    <span className="inline-flex shrink-0 items-center rounded-sm border border-brass/50 bg-brass-tint px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-widest text-brass">
       ◈ Superseded
     </span>
   );
