@@ -52,7 +52,7 @@ Two real scenarios shape how decisions actually get in: (1) a PM starting to log
 3. **Log a decision** — three ways in: (a) fill the form directly, (b) paste any raw source text (Slack thread, notes, doc excerpt) and let Gemini draft one candidate entry for review before saving, or (c) paste/upload an entire existing decision document (e.g. a PR-FAQ) and let Gemini extract multiple candidates into a bulk review queue — approve, edit, or reject each before committing. The blank form is the fallback when there's nothing to paste, not the primary path.
 4. **On save** — backend concatenates the relevant text fields, calls the Gemini embedding endpoint, stores the vector in Supabase (pgvector) alongside the structured record.
 5. **Browse** — timeline/list view of decisions within a project, filterable by tag/date.
-6. **Semantic search** — user asks a natural-language question, either scoped to a project or across all their projects (e.g. "why did we deprioritize the mobile redesign"). Query is embedded, pgvector similarity search returns the top-k matching decisions, and Gemini generates a short synthesized answer that cites the matched decision(s) by name/link — not just a bare list of results.
+6. **Semantic search** — user asks a natural-language question. When inside a project, search defaults to **that project**, with a one-click toggle to widen to all projects; from the dashboard (no current project) it searches all projects. Query is embedded, pgvector similarity search returns the top-k matching decisions, and Gemini generates a short synthesized answer that cites the matched decision(s) by name/link — not just a bare list of results.
 7. **Decision detail page** — full record, plus an auto-surfaced "related decisions" panel (same-project vector neighbors, excluding itself).
 8. **Supersede** — a decision can be marked as superseded by a later one; both records show the link (badge + "supersedes" / "superseded by"), so reversals are visible instead of orphaned.
 
@@ -64,7 +64,7 @@ Two real scenarios shape how decisions actually get in: (1) a PM starting to log
 | FR2 | Projects — create, rename, archive |
 | FR3 | Decisions — full CRUD within a project |
 | FR4 | Embedding generation on decision create/update, stored in pgvector |
-| FR5 | Semantic search — project-scoped or global, returns ranked matches + a short Gemini-synthesized answer citing them |
+| FR5 | Semantic search — defaults to the current project when inside one, widenable to all projects via a toggle; global from the dashboard. Returns ranked matches + a short Gemini-synthesized answer citing them |
 | FR6 | Related decisions — auto vector-similarity lookup on the detail page |
 | FR7 | Supersede — link a decision to the one that replaces it, shown bidirectionally |
 | FR8 | Paste & draft (single decision) — user pastes any raw source text, Gemini drafts one candidate decision's fields, user reviews and edits before saving. Human-in-the-loop by design — no unreviewed AI output becomes the record of record. |
