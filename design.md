@@ -29,23 +29,29 @@ Warm paper, not clinical white — the archival feel has to survive the inversio
 | Surface | `#F3F1EC` | Card / panel background |
 | Ink (text) | `#1C2230` | Primary text |
 | Muted | `#706B60` | Secondary text, timestamps, metadata |
-| Brass (dark) | `#8A5E1A` | Primary accent for **text and small elements** |
-| Brass (fill) | `#B47E28` | Primary accent for **filled buttons / larger areas** — pair with **Ink text, never white** |
+| Brass (dark) | `#7A5216` | Accent for **text and small elements** |
+| Brass (fill) | `#D9A845` | Filled buttons / larger areas — pair with **Ink text, never white**, plus a `#B47E28` border for edge definition |
+| Brass (tint) | `#EDE4D0` | Selected / active state backgrounds |
 | Verdigris (dark) | `#2E5C53` | Secondary accent — supersession indicators |
 | Rule | `#E4E0D8` | Borders, ledger separators |
 
-**Critical:** dark mode's Brass (`#C89B4A`) must never be reused for text in light mode — it measures ~7.35:1 on Ink but drops to roughly 2:1 on Paper, failing contrast. Light mode gets its own two brass tokens: a darker one for text, a mid one for fills.
+**Critical:** dark mode's Brass (`#C89B4A`) must never be reused for text in light mode — it measures ~7.35:1 on Ink but drops to roughly 2:1 on Paper, failing contrast.
 
-**Measured light-mode ratios** (computed, not assumed — an earlier draft of this table shipped two values that failed):
+**Selected and active states must stack signals, not rely on one.** A tint background alone is too subtle at these luminances — on Surface, `#EDE4D0` is only about 1.13:1 against the panel behind it. Every selected state (sidebar project, segmented pills like All projects / This project, the theme toggle) uses tint background **plus** Brass (dark) text **plus** semibold weight; segmented controls add a `#E4E0D8` border or subtle shadow to lift the active segment out of its track.
+
+**Measured light-mode ratios** (computed, not assumed — an earlier draft of this table shipped values that failed):
 
 | Pair | Ratio | Verdict |
 |---|---|---|
 | Muted `#706B60` on Paper | 5.08:1 | passes AA |
-| Muted `#706B60` on Surface | 4.69:1 | passes AA — this is the binding constraint, since muted text sits on cards as well as the page |
-| Brass (dark) `#8A5E1A` on Paper | 5.44:1 | passes AA |
-| Brass (dark) `#8A5E1A` on Surface | 5.03:1 | passes AA |
-| Ink `#1C2230` on Brass fill `#B47E28` | 4.51:1 | passes AA |
-| White on Brass fill `#B47E28` | 3.53:1 | **fails** — do not use white text on brass fills |
+| Muted `#706B60` on Surface | 4.69:1 | passes AA — binding constraint, since muted text sits on cards as well as the page |
+| Brass (dark) `#7A5216` on Paper | 6.60:1 | passes AA |
+| Brass (dark) `#7A5216` on Surface | 6.11:1 | passes AA |
+| Brass (dark) `#7A5216` on Brass tint `#EDE4D0` | 5.45:1 | passes AA — this is why Brass (dark) is `#7A5216` and not `#8A5E1A`, which lands at 4.49:1 |
+| Ink `#1C2230` on Brass fill `#D9A845` | 7.30:1 | passes AA |
+| Verdigris (dark) `#2E5C53` on Paper | 7.26:1 | passes AA |
+| White on Brass fill | 3.53:1 | **fails** — never use white text on brass fills |
+| Brass fill `#D9A845` boundary vs Paper | 2.09:1 | below the 3:1 non-text floor — hence the required border |
 
 ## Typography
 

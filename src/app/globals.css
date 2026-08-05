@@ -31,6 +31,9 @@
   /* Lightened brass for small interactive text (contrast headroom on ink). */
   --color-brass-light: #e0b968;
   --color-on-brass: #0b1220; /* text sitting on a brass fill */
+  /* Edge on filled brass buttons. Dark needs none (the fill already separates
+     from ink), so it stays transparent there — see design.md's light table. */
+  --color-brass-edge: transparent;
   --color-verdigris: #3f7a6e;
 
   /* Borders. Dark uses a parchment veil; light uses design.md's Rule token. */
@@ -65,9 +68,10 @@ html.light {
   --color-surface-2: #f0eee8;
   --color-parchment: #1c2230; /* Ink (text) */
   --color-muted: #706b60; /* Muted */
-  --color-brass: #8a5e1a; /* Brass (dark) — text + small elements */
-  --color-brass-fill: #b47e28; /* Brass (fill) — filled buttons */
-  --color-brass-light: #8a5e1a; /* accent text converges on Brass (dark) */
+  --color-brass: #7a5216; /* Brass (dark) — text + small elements */
+  --color-brass-fill: #d9a845; /* Brass (fill) — filled buttons */
+  --color-brass-light: #7a5216; /* accent text converges on Brass (dark) */
+  --color-brass-edge: #b47e28; /* required: the lighter fill is 2.09:1 on Paper */
   --color-on-brass: #1c2230;
   --color-verdigris: #2e5c53; /* Verdigris (dark) */
 
@@ -79,9 +83,7 @@ html.light {
   --color-nav-bg: rgba(251, 250, 247, 0.9);
   --color-shadow: rgba(28, 34, 48, 0.14);
   --color-brass-veil: rgba(138, 94, 26, 0.14);
-  /* Opaque, very light warm wash: a translucent brass tint would darken the
-     backdrop enough to drop Brass(dark) text under 4.5:1. */
-  --color-brass-tint: color-mix(in srgb, #b47e28 6%, #fbfaf7);
+  --color-brass-tint: #ede4d0; /* Brass (tint) — selected/active backgrounds */
 }
 
 html {
@@ -1279,4 +1281,66 @@ html.light .shell .crumbs .sep {
   .shell .tb-search {
     transition: none;
   }
+}
+
+/* ============================================================
+ * Light-mode polish (design.md light table). Every rule here is scoped to
+ * `html.light`, so dark mode keeps its existing treatment untouched.
+ * ============================================================ */
+
+/*
+ * 1. Filled brass buttons. The lighter #D9A845 fill only measures 2.09:1
+ * against Paper — below the 3:1 non-text floor — so the button edge needs a
+ * #B47E28 border to be findable. Ink text on the fill is 7.30:1.
+ * `.shell-btn` already reserves a 1px transparent border, so it only needs a
+ * colour (no layout shift).
+ */
+html.light .bg-brass-fill {
+  border: 1px solid var(--color-brass-edge);
+}
+html.light .shell .shell-btn-primary {
+  border-color: var(--color-brass-edge);
+}
+html.light .landing .submit,
+html.light .landing .cta-btn {
+  border: 1px solid var(--color-brass-edge);
+}
+
+/*
+ * 2. Selected / active states stack three signals: tint background, Brass
+ * (dark) text, semibold weight. A tint alone is ~1.13:1 against Surface, which
+ * is why the single-signal version read as barely-there.
+ */
+html.light .shell .side-item.active,
+html.light .shell .tb-scope button.on,
+html.light .shell .tb-theme-options button.on,
+html.light .landing .tabs button.active {
+  font-weight: 600;
+}
+
+/*
+ * The segmented controls additionally lift out of their track with a Rule ring
+ * plus a soft shadow (design.md allows border *or* shadow; an inset ring avoids
+ * resizing the segments and reflowing the pill).
+ */
+html.light .shell .tb-scope button.on,
+html.light .shell .tb-theme-options button.on,
+html.light .landing .tabs button.active {
+  /* The Rule ring is spec'd, but measures only 1.13:1 against the track, so the
+     shadow is what actually does the lifting here (design.md allows either).
+     Two stacked layers keep it subtle while staying visible on warm paper. */
+  box-shadow:
+    inset 0 0 0 1px var(--color-rule),
+    0 1px 2px var(--color-shadow),
+    0 1px 1px var(--color-shadow);
+}
+
+/*
+ * The landing page's Sign in / Sign up tabs are the same kind of segmented
+ * control, so they get the same treatment rather than the paper-on-track fill
+ * they inherited (found while auditing for other single-signal states).
+ */
+html.light .landing .tabs button.active {
+  background: var(--color-brass-tint);
+  color: var(--color-brass);
 }
